@@ -1,6 +1,8 @@
 
+using System.Net.NetworkInformation;
 using Grpc.Net.Client;
 using TestWinformClient.Protos;
+using static System.Net.WebRequestMethods;
 
 namespace TestWinformClient
 {
@@ -15,6 +17,8 @@ namespace TestWinformClient
         private Greeter.GreeterClient? GreeterClient { get; set; }
 
         private List<Greeter.GreeterClient> _succesfulClients { get; set; }
+
+        private string IPAddress { get; set; }
 
         private void TestConnectionBtn_Click(object sender, EventArgs e)
         {
@@ -55,7 +59,7 @@ namespace TestWinformClient
         {
             try
             {
-                var channel = GrpcChannel.ForAddress($"http://localhost:{portNumber}");
+                var channel = GrpcChannel.ForAddress($"{IPAddress}:{portNumber}");
                 var testClient = new Greeter.GreeterClient(channel);
 
                 var input = new TestRequest { };
@@ -97,5 +101,33 @@ namespace TestWinformClient
             debugTxtBox.Text += $"The active port has now been set to: {portNumbersList.SelectedItem}.\r\n";
             activePortLbl.Text = $"{portNumbersList.SelectedItem}";
         }
+
+        private void IPTestBtn_Click(object sender, EventArgs e)
+        {
+            string iPAddress = IPAddressTxtBox.Text;
+            if (string.IsNullOrEmpty(iPAddress))
+            {
+                IPAddress = "http://localhost";
+                debugTxtBox.Text += "IP address is set to http://localhost.\r\n";
+                return;
+            }
+
+            Ping pingSender = new Ping();
+
+            PingReply reply = pingSender.Send(iPAddress);
+
+            if (reply.Status == IPStatus.Success)
+            {
+                debugTxtBox.Text += $"Ping from {iPAddress} was successful! Round-trip time: " + reply.RoundtripTime + "ms}.\r\n";
+                IPAddress = iPAddress;
+            }
+            else
+            {
+                debugTxtBox.Text += $"Ping from {iPAddress} failed!.\r\n";
+            }
+
+        }
+
+        
     }
 }

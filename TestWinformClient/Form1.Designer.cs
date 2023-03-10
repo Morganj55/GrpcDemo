@@ -40,6 +40,9 @@
             SetActivePortBtn = new Button();
             label4 = new Label();
             activePortLbl = new Label();
+            label5 = new Label();
+            IPAddressTxtBox = new TextBox();
+            IPTestBtn = new Button();
             SuspendLayout();
             // 
             // TestConnectionBtn
@@ -62,11 +65,11 @@
             // label1
             // 
             label1.AutoSize = true;
-            label1.Location = new Point(482, 347);
+            label1.Location = new Point(469, 347);
             label1.Name = "label1";
-            label1.Size = new Size(32, 15);
+            label1.Size = new Size(45, 15);
             label1.TabIndex = 3;
-            label1.Text = "Port:";
+            label1.Text = "IP Port:";
             // 
             // label2
             // 
@@ -100,7 +103,7 @@
             debugTxtBox.Multiline = true;
             debugTxtBox.Name = "debugTxtBox";
             debugTxtBox.ReadOnly = true;
-            debugTxtBox.Size = new Size(776, 325);
+            debugTxtBox.Size = new Size(776, 269);
             debugTxtBox.TabIndex = 7;
             // 
             // label3
@@ -149,11 +152,40 @@
             activePortLbl.Size = new Size(0, 30);
             activePortLbl.TabIndex = 12;
             // 
+            // label5
+            // 
+            label5.AutoSize = true;
+            label5.Location = new Point(449, 314);
+            label5.Name = "label5";
+            label5.Size = new Size(65, 15);
+            label5.TabIndex = 13;
+            label5.Text = "IP Address:";
+            // 
+            // IPAddressTxtBox
+            // 
+            IPAddressTxtBox.Location = new Point(520, 310);
+            IPAddressTxtBox.Name = "IPAddressTxtBox";
+            IPAddressTxtBox.Size = new Size(100, 23);
+            IPAddressTxtBox.TabIndex = 14;
+            // 
+            // IPTestBtn
+            // 
+            IPTestBtn.Location = new Point(635, 310);
+            IPTestBtn.Name = "IPTestBtn";
+            IPTestBtn.Size = new Size(131, 23);
+            IPTestBtn.TabIndex = 15;
+            IPTestBtn.Text = "Ping IP Address";
+            IPTestBtn.UseVisualStyleBackColor = true;
+            IPTestBtn.Click += IPTestBtn_Click;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 450);
+            Controls.Add(IPTestBtn);
+            Controls.Add(IPAddressTxtBox);
+            Controls.Add(label5);
             Controls.Add(activePortLbl);
             Controls.Add(label4);
             Controls.Add(SetActivePortBtn);
@@ -186,5 +218,8 @@
         private Button SetActivePortBtn;
         private Label label4;
         private Label activePortLbl;
+        private Label label5;
+        private TextBox IPAddressTxtBox;
+        private Button IPTestBtn;
     }
 }

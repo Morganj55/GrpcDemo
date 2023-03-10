@@ -112,22 +112,30 @@ namespace TestWinformClient
                 return;
             }
 
-            Ping pingSender = new Ping();
-
-            PingReply reply = pingSender.Send(iPAddress);
-
-            if (reply.Status == IPStatus.Success)
+            try
             {
-                debugTxtBox.Text += $"Ping from {iPAddress} was successful! Round-trip time: " + reply.RoundtripTime + "ms}.\r\n";
-                IPAddress = iPAddress;
+                Ping pingSender = new Ping();
+
+                PingReply reply = pingSender.Send(iPAddress);
+
+                if (reply.Status == IPStatus.Success)
+                {
+                    debugTxtBox.Text += $"Ping from {iPAddress} was successful! Round-trip time: " +
+                                        reply.RoundtripTime + "ms}.\r\n";
+                    IPAddress = iPAddress;
+                }
+                debugTxtBox.Text += $"Ping from {iPAddress} failed!.\r\n";
+                
             }
-            else
+            catch (Exception ex)
             {
                 debugTxtBox.Text += $"Ping from {iPAddress} failed!.\r\n";
             }
 
+
+
         }
 
-        
+
     }
 }

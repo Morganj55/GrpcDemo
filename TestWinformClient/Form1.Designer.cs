@@ -46,14 +46,21 @@
             tabcontrol = new TabControl();
             tabPage1 = new TabPage();
             tabPage2 = new TabPage();
-            UnixSocketBtn = new Button();
-            tabPage3 = new TabPage();
             UnixNameTxtBox = new TextBox();
             label6 = new Label();
             UnixGetServerReply = new Button();
+            UnixSocketBtn = new Button();
+            tabPage3 = new TabPage();
+            tabControl1 = new TabControl();
+            tabPage4 = new TabPage();
+            tabPage5 = new TabPage();
+            BackgroundTxtBox = new TextBox();
             tabcontrol.SuspendLayout();
             tabPage1.SuspendLayout();
             tabPage2.SuspendLayout();
+            tabControl1.SuspendLayout();
+            tabPage4.SuspendLayout();
+            tabPage5.SuspendLayout();
             SuspendLayout();
             // 
             // TestConnectionBtn
@@ -110,11 +117,12 @@
             // 
             // debugTxtBox
             // 
-            debugTxtBox.Location = new Point(12, 12);
+            debugTxtBox.Dock = DockStyle.Fill;
+            debugTxtBox.Location = new Point(3, 3);
             debugTxtBox.Multiline = true;
             debugTxtBox.Name = "debugTxtBox";
             debugTxtBox.ReadOnly = true;
-            debugTxtBox.Size = new Size(776, 269);
+            debugTxtBox.Size = new Size(762, 246);
             debugTxtBox.TabIndex = 7;
             // 
             // label3
@@ -238,25 +246,6 @@
             tabPage2.Text = "Unix Domain Sockets";
             tabPage2.UseVisualStyleBackColor = true;
             // 
-            // UnixSocketBtn
-            // 
-            UnixSocketBtn.Location = new Point(573, 26);
-            UnixSocketBtn.Name = "UnixSocketBtn";
-            UnixSocketBtn.Size = new Size(189, 23);
-            UnixSocketBtn.TabIndex = 0;
-            UnixSocketBtn.Text = "Create Unix Socket Connection";
-            UnixSocketBtn.UseVisualStyleBackColor = true;
-            UnixSocketBtn.Click += UnixSocketBtn_Click;
-            // 
-            // tabPage3
-            // 
-            tabPage3.Location = new Point(4, 24);
-            tabPage3.Name = "tabPage3";
-            tabPage3.Size = new Size(768, 123);
-            tabPage3.TabIndex = 2;
-            tabPage3.Text = "Discovery";
-            tabPage3.UseVisualStyleBackColor = true;
-            // 
             // UnixNameTxtBox
             // 
             UnixNameTxtBox.Location = new Point(525, 65);
@@ -283,12 +272,72 @@
             UnixGetServerReply.UseVisualStyleBackColor = true;
             UnixGetServerReply.Click += UnixGetServerReply_Click;
             // 
+            // UnixSocketBtn
+            // 
+            UnixSocketBtn.Location = new Point(573, 26);
+            UnixSocketBtn.Name = "UnixSocketBtn";
+            UnixSocketBtn.Size = new Size(189, 23);
+            UnixSocketBtn.TabIndex = 0;
+            UnixSocketBtn.Text = "Create Unix Socket Connection";
+            UnixSocketBtn.UseVisualStyleBackColor = true;
+            UnixSocketBtn.Click += UnixSocketBtn_Click;
+            // 
+            // tabPage3
+            // 
+            tabPage3.Location = new Point(4, 24);
+            tabPage3.Name = "tabPage3";
+            tabPage3.Size = new Size(768, 123);
+            tabPage3.TabIndex = 2;
+            tabPage3.Text = "Discovery";
+            tabPage3.UseVisualStyleBackColor = true;
+            // 
+            // tabControl1
+            // 
+            tabControl1.Controls.Add(tabPage4);
+            tabControl1.Controls.Add(tabPage5);
+            tabControl1.Location = new Point(12, 12);
+            tabControl1.Name = "tabControl1";
+            tabControl1.SelectedIndex = 0;
+            tabControl1.Size = new Size(776, 280);
+            tabControl1.TabIndex = 17;
+            // 
+            // tabPage4
+            // 
+            tabPage4.Controls.Add(debugTxtBox);
+            tabPage4.Location = new Point(4, 24);
+            tabPage4.Name = "tabPage4";
+            tabPage4.Padding = new Padding(3);
+            tabPage4.Size = new Size(768, 252);
+            tabPage4.TabIndex = 0;
+            tabPage4.Text = "Debug Window";
+            tabPage4.UseVisualStyleBackColor = true;
+            // 
+            // tabPage5
+            // 
+            tabPage5.Controls.Add(BackgroundTxtBox);
+            tabPage5.Location = new Point(4, 24);
+            tabPage5.Name = "tabPage5";
+            tabPage5.Padding = new Padding(3);
+            tabPage5.Size = new Size(768, 252);
+            tabPage5.TabIndex = 1;
+            tabPage5.Text = "Background Services";
+            tabPage5.UseVisualStyleBackColor = true;
+            // 
+            // BackgroundTxtBox
+            // 
+            BackgroundTxtBox.Dock = DockStyle.Fill;
+            BackgroundTxtBox.Location = new Point(3, 3);
+            BackgroundTxtBox.Multiline = true;
+            BackgroundTxtBox.Name = "BackgroundTxtBox";
+            BackgroundTxtBox.Size = new Size(762, 246);
+            BackgroundTxtBox.TabIndex = 0;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 450);
-            Controls.Add(debugTxtBox);
+            Controls.Add(tabControl1);
             Controls.Add(tabcontrol);
             Name = "Form1";
             Text = "Form1";
@@ -297,8 +346,12 @@
             tabPage1.PerformLayout();
             tabPage2.ResumeLayout(false);
             tabPage2.PerformLayout();
+            tabControl1.ResumeLayout(false);
+            tabPage4.ResumeLayout(false);
+            tabPage4.PerformLayout();
+            tabPage5.ResumeLayout(false);
+            tabPage5.PerformLayout();
             ResumeLayout(false);
-            PerformLayout();
         }
 
         #endregion
@@ -326,5 +379,9 @@
         private TextBox UnixNameTxtBox;
         private Label label6;
         private Button UnixGetServerReply;
+        private TabControl tabControl1;
+        private TabPage tabPage4;
+        private TabPage tabPage5;
+        private TextBox BackgroundTxtBox;
     }
 }

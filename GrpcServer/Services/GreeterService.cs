@@ -20,20 +20,7 @@ namespace GrpcServer.Services
             });
         }
 
-        public override Task<TestReply> TestConnection(TestRequest request, ServerCallContext context)
-        {
-            // Delete the socket file if it already exists
-            var socketPath = Path.Combine(Path.GetTempPath(), "socket.tmp");
-            if (File.Exists(socketPath))
-            {
-                File.Delete(socketPath);
-            }
-
-            return Task.FromResult(new TestReply
-            {
-                ConnectionResponse = "The server successfully established a connection with port: "
-            });
-        }
+   
 
     }
 }

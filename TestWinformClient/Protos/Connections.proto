@@ -1,0 +1,28 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "TestWinformClient.Protos";
+
+
+// The greeting service definition.
+service Connections {
+  // Sends a greeting
+  rpc TestConnection (TestRequest) returns (TestReply);
+  rpc EstablishConnectionHealthCheck (ConnectionRequest) returns (ConnectionResponse);
+
+}
+
+message TestRequest {
+
+}
+
+message TestReply{
+	string connectionResponse = 1;
+}
+
+message ConnectionRequest{
+
+}
+
+message ConnectionResponse{
+	string licence = 1;
+}

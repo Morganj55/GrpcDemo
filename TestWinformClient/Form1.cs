@@ -16,7 +16,7 @@ namespace TestWinformClient
         public Form1()
         {
             InitializeComponent();
-            _succesfulTCPClients = new List<Greeter.GreeterClient>();
+            _succesfulTCPClients = new List<Connections.ConnectionsClient>();
             _succesfulUnixClients = new List<Greeter.GreeterClient>();
             //IPAddressTxtBox.Text = "192.168.1.160";
             portTxtBox.Text = "5001";
@@ -24,7 +24,7 @@ namespace TestWinformClient
 
         private Greeter.GreeterClient? GreeterClient { get; set; }
 
-        private List<Greeter.GreeterClient> _succesfulTCPClients { get; set; }
+        private List<Connections.ConnectionsClient> _succesfulTCPClients { get; set; }
 
         private List<Greeter.GreeterClient> _succesfulUnixClients { get; set; }
 
@@ -46,7 +46,7 @@ namespace TestWinformClient
                 return;
             }
 
-            Greeter.GreeterClient? client;
+            Connections.ConnectionsClient? client;
             if (UnableToFormConnection(portNum, out client))
             {
                 return;
@@ -60,17 +60,18 @@ namespace TestWinformClient
                 }
             }
 
+            GreeterClient = new Greeter.GreeterClient(GrpcChannel.ForAddress($"http://{IPAddress}:{portNum}"));
             _succesfulTCPClients.Add(client);
             portNumbersList.Items.Add(portNum);
-            await CheckConnection(portNum);
+            await EstablishHealthConnection(client);
         }
 
-        private bool UnableToFormConnection(int portNumber, out Greeter.GreeterClient? client)
+        private bool UnableToFormConnection(int portNumber, out Connections.ConnectionsClient? client)
         {
             try
             {
                 var channel = GrpcChannel.ForAddress($"http://{IPAddress}:{portNumber}");
-                var testClient = new Greeter.GreeterClient(channel);
+                var testClient = new Connections.ConnectionsClient(channel);
 
                 var input = new TestRequest { };
                 Cursor.Current = Cursors.WaitCursor;
@@ -107,7 +108,6 @@ namespace TestWinformClient
             {
                 return;
             }
-            GreeterClient = _succesfulTCPClients[portNumbersList.SelectedIndex];
             debugTxtBox.Text += $"The active port has now been set to: {portNumbersList.SelectedItem}.\r\n";
             activePortLbl.Text = $"{IPAddress}:{portNumbersList.SelectedItem}";
         }
@@ -150,7 +150,7 @@ namespace TestWinformClient
             var channel = CreateChannel(SocketPath);
             try
             {
-                var testClient = new Greeter.GreeterClient(channel);
+                var testClient = new Connections.ConnectionsClient(channel);
                 var input = new TestRequest { };
                 Cursor.Current = Cursors.WaitCursor;
                 var reply = testClient.TestConnection(input);
@@ -158,7 +158,7 @@ namespace TestWinformClient
                 Cursor.Current = Cursors.Default;
                 var outputMessage = reply.ConnectionResponse;
                 outputMessage = outputMessage.Substring(0, outputMessage.Length - 7);
-                _succesfulUnixClients.Add(testClient);
+                _succesfulUnixClients.Add(new Greeter.GreeterClient(channel));
                 debugTxtBox.Text += $"{outputMessage} Unix Socket: {SocketPath}.\r\n";
             }
             catch (Exception ex)
@@ -194,25 +194,27 @@ namespace TestWinformClient
             debugTxtBox.Text += $"The server responded from the Unix Socket with: {reply.Message}\r\n";
         }
 
-        private async Task CheckConnection(int portNumber)
+        private async Task EstablishHealthConnection(Connections.ConnectionsClient client)
         {
-            var channel = GrpcChannel.ForAddress($"http://{IPAddress}:{portNumber}");
-            var healthClient = new Health.HealthClient(channel);
-            var watchTask = healthClient.Watch(new HealthCheckRequest());
-            var watch = watchTask.ResponseStream;
-            try
+            while (true)
             {
-                while (await watch.MoveNext())
+                try
                 {
-                    var response = watch.Current;
-                    debugTxtBox.Text += $"Health status: {response.Status}\r\n";
+                    var serverResponse = await client.EstablishConnectionHealthCheckAsync(new ConnectionRequest());
+                    BackgroundTxtBox.Text += $"Server connection is: Serving.\r\n";
+                    BackgroundTxtBox.Text += $"Currently using License: {serverResponse.Licence}\r\n";
+                    await Task.Delay(5000);
                 }
-            }
-            finally
-            {
-                //await watch.DisposeAsync();
+                catch (Exception e)
+                {
+                    debugTxtBox.Text += $"Error connecting to server. Please check the background services window.\r\n";
+                    BackgroundTxtBox.Text = $"{e}";
+                    break;
+                }
             }
 
         }
+
+
     }
 }

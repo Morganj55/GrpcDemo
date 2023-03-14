@@ -7,16 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Protos\customers.proto" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Protobuf Include="Protos\customers.proto" GrpcServices="Server" />
     <Protobuf Include="Protos\greet.proto" GrpcServices="Server" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Grpc.AspNetCore" Version="2.40.0" />
+    <PackageReference Include="Grpc.AspNetCore.HealthChecks" Version="2.51.0" />
     <PackageReference Include="Grpc.AspNetCore.Server.Reflection" Version="2.51.0" />
     <PackageReference Include="Microsoft.AspNetCore.Server.Kestrel.Core" Version="2.2.0" />
     <PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="7.0.0" />

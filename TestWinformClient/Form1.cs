@@ -201,14 +201,16 @@ namespace TestWinformClient
                 try
                 {
                     var serverResponse = await client.EstablishConnectionHealthCheckAsync(new ConnectionRequest());
-                    BackgroundTxtBox.Text += $"Server connection is: Serving.\r\n";
-                    BackgroundTxtBox.Text += $"Currently using License: {serverResponse.Licence}\r\n";
-                    await Task.Delay(5000);
+                    backgroundTxtBox.Text += $"Server connection is: Serving.\r\n";
+                    backgroundTxtBox.Text += $"Currently using License: {serverResponse.Licence}\r\n";
+                    backgroundTxtBox.Text += $"There are currently {serverResponse.ConnectedClients} clients.\r\n";
+                    backgroundTxtBox.Text += "\r\n";
+                   await Task.Delay(5000);
                 }
                 catch (Exception e)
                 {
                     debugTxtBox.Text += $"Error connecting to server. Please check the background services window.\r\n";
-                    BackgroundTxtBox.Text = $"{e}";
+                    //backgroundTxtBox.Text = $"{e}";
                     break;
                 }
             }

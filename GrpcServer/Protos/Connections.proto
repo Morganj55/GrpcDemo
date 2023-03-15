@@ -25,4 +25,5 @@ message ConnectionRequest{
 
 message ConnectionResponse{
 	string licence = 1;
+	int32 connectedClients = 2;
 }

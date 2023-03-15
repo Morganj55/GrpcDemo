@@ -40,6 +40,7 @@ builder.WebHost.ConfigureKestrel((context, options) =>
 builder.Host.UseWindowsService();
 builder.Services.AddGrpcReflection();
 builder.Services.AddGrpc();
+builder.Services.AddSingleton<ConnectionsService>();
 
 
 

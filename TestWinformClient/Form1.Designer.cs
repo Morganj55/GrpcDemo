@@ -54,7 +54,7 @@
             tabControl1 = new TabControl();
             tabPage4 = new TabPage();
             tabPage5 = new TabPage();
-            BackgroundTxtBox = new TextBox();
+            backgroundTxtBox = new TextBox();
             tabcontrol.SuspendLayout();
             tabPage1.SuspendLayout();
             tabPage2.SuspendLayout();
@@ -122,6 +122,7 @@
             debugTxtBox.Multiline = true;
             debugTxtBox.Name = "debugTxtBox";
             debugTxtBox.ReadOnly = true;
+            debugTxtBox.ScrollBars = ScrollBars.Both;
             debugTxtBox.Size = new Size(762, 246);
             debugTxtBox.TabIndex = 7;
             // 
@@ -314,7 +315,7 @@
             // 
             // tabPage5
             // 
-            tabPage5.Controls.Add(BackgroundTxtBox);
+            tabPage5.Controls.Add(backgroundTxtBox);
             tabPage5.Location = new Point(4, 24);
             tabPage5.Name = "tabPage5";
             tabPage5.Padding = new Padding(3);
@@ -323,14 +324,15 @@
             tabPage5.Text = "Background Services";
             tabPage5.UseVisualStyleBackColor = true;
             // 
-            // BackgroundTxtBox
+            // backgroundTxtBox
             // 
-            BackgroundTxtBox.Dock = DockStyle.Fill;
-            BackgroundTxtBox.Location = new Point(3, 3);
-            BackgroundTxtBox.Multiline = true;
-            BackgroundTxtBox.Name = "BackgroundTxtBox";
-            BackgroundTxtBox.Size = new Size(762, 246);
-            BackgroundTxtBox.TabIndex = 0;
+            backgroundTxtBox.Dock = DockStyle.Fill;
+            backgroundTxtBox.Location = new Point(3, 3);
+            backgroundTxtBox.Multiline = true;
+            backgroundTxtBox.Name = "backgroundTxtBox";
+            backgroundTxtBox.ScrollBars = ScrollBars.Both;
+            backgroundTxtBox.Size = new Size(762, 246);
+            backgroundTxtBox.TabIndex = 0;
             // 
             // Form1
             // 
@@ -382,6 +384,6 @@
         private TabControl tabControl1;
         private TabPage tabPage4;
         private TabPage tabPage5;
-        private TextBox BackgroundTxtBox;
+        private TextBox backgroundTxtBox;
     }
 }

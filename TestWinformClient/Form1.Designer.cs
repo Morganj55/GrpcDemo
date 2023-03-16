@@ -42,6 +42,8 @@
             IPTestBtn = new Button();
             tabcontrol = new TabControl();
             tabPage1 = new TabPage();
+            ConnectionStatusLbl = new Label();
+            label3 = new Label();
             DisconnectBtn = new Button();
             label7 = new Label();
             tabPage2 = new TabPage();
@@ -54,8 +56,6 @@
             tabPage4 = new TabPage();
             tabPage5 = new TabPage();
             backgroundTxtBox = new TextBox();
-            label3 = new Label();
-            ConnectionStatusLbl = new Label();
             tabcontrol.SuspendLayout();
             tabPage1.SuspendLayout();
             tabPage2.SuspendLayout();
@@ -208,6 +208,25 @@
             tabPage1.Text = "TCP Connections";
             tabPage1.UseVisualStyleBackColor = true;
             // 
+            // ConnectionStatusLbl
+            // 
+            ConnectionStatusLbl.AutoSize = true;
+            ConnectionStatusLbl.Font = new Font("Segoe UI", 14.25F, FontStyle.Regular, GraphicsUnit.Point);
+            ConnectionStatusLbl.Location = new Point(196, 75);
+            ConnectionStatusLbl.Name = "ConnectionStatusLbl";
+            ConnectionStatusLbl.Size = new Size(0, 25);
+            ConnectionStatusLbl.TabIndex = 19;
+            // 
+            // label3
+            // 
+            label3.AutoSize = true;
+            label3.Font = new Font("Segoe UI", 15.75F, FontStyle.Bold, GraphicsUnit.Point);
+            label3.Location = new Point(3, 72);
+            label3.Name = "label3";
+            label3.Size = new Size(198, 30);
+            label3.TabIndex = 18;
+            label3.Text = "Connection Status:";
+            // 
             // DisconnectBtn
             // 
             DisconnectBtn.Location = new Point(501, 75);
@@ -327,25 +346,6 @@
             backgroundTxtBox.ScrollBars = ScrollBars.Both;
             backgroundTxtBox.Size = new Size(762, 246);
             backgroundTxtBox.TabIndex = 0;
-            // 
-            // label3
-            // 
-            label3.AutoSize = true;
-            label3.Font = new Font("Segoe UI", 15.75F, FontStyle.Bold, GraphicsUnit.Point);
-            label3.Location = new Point(3, 64);
-            label3.Name = "label3";
-            label3.Size = new Size(198, 30);
-            label3.TabIndex = 18;
-            label3.Text = "Connection Status:";
-            // 
-            // ConnectionStatusLbl
-            // 
-            ConnectionStatusLbl.AutoSize = true;
-            ConnectionStatusLbl.Font = new Font("Segoe UI", 14.25F, FontStyle.Regular, GraphicsUnit.Point);
-            ConnectionStatusLbl.Location = new Point(196, 75);
-            ConnectionStatusLbl.Name = "ConnectionStatusLbl";
-            ConnectionStatusLbl.Size = new Size(0, 25);
-            ConnectionStatusLbl.TabIndex = 19;
             // 
             // Form1
             // 

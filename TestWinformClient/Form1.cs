@@ -221,7 +221,7 @@ namespace TestWinformClient
             HealthCheckRunning = true;
             while (true)
             {
-                if (CheckForDisconnectionEvent())
+                if (DisconnectionEventFired())
                 {
                     break;
                 }
@@ -259,16 +259,22 @@ namespace TestWinformClient
                 {
                     if (i == 1)
                     {
-                        debugTxtBox.Text += "Lost server connection, attmpeting reconnection.\r\n";
+                        debugTxtBox.Text += "Connection lost, attmpeting reconnection to server.\r\n";
                     }
                     backgroundTxtBox.Text += $"Reattempting connection: ({i}/10).\r\n";
                     ConnectionStatusLbl.Text = "Reconnecting...";
+                    backgroundTxtBox.SelectionStart = backgroundTxtBox.Text.Length;
+                    backgroundTxtBox.ScrollToCaret();
+
                     await Task.Delay(1000);
                     var serverResponse =
                         await client.EstablishConnectionHealthCheckAsync(new ConnectionRequest());
+
                     backgroundTxtBox.Text += $"Connection reestablished.\r\n";
                     backgroundTxtBox.Text += "\r\n";
                     debugTxtBox.Text += "Connection reestablished.\r\n";
+                    backgroundTxtBox.SelectionStart = backgroundTxtBox.Text.Length;
+                    backgroundTxtBox.ScrollToCaret();
                     await EstablishHealthConnection(client);
                     break;
                 }
@@ -285,7 +291,7 @@ namespace TestWinformClient
             }
         }
 
-        private bool CheckForDisconnectionEvent()
+        private bool DisconnectionEventFired()
         {
             if (Disconnected)
             {

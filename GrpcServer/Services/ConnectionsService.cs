@@ -135,7 +135,7 @@ namespace GrpcServer.Services
             while (true)
             {
                 //preDelayConnection count is set to the IP address specific connection count
-                //during Task.Delay, the IP address specific connection count will be incremented (every 5 seconds)
+                //during Task.Delay, the IP address specific connection count will be incremented (every 5 seconds) if the client is still connected 
                 //if it hasnt been incremented, both numbers will be the same which means the client has disconnected
                 var preDelayConnectionCount = _addressConnectionCount[iPAddress];
                 await Task.Delay(10000);

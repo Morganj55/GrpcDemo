@@ -119,8 +119,6 @@ namespace TestWinformClient
             }
         }
 
-
-
         private void ServerReplyButton_Click(object sender, EventArgs e)
         {
             if (GreeterClient == null)
@@ -129,9 +127,8 @@ namespace TestWinformClient
             }
 
             var reply = GreeterClient.SayHello(new HelloRequest { Name = nameTxtBox.Text });
-            //debugTxtBox.Text += $"The server responded from port {portNumbersList.SelectedItem} with: {reply.Message}\r\n";
+            debugTxtBox.Text += $"The server responded with: {reply.Message}\r\n";
         }
-
 
         private void IPTestBtn_Click(object sender, EventArgs e)
         {
@@ -246,6 +243,7 @@ namespace TestWinformClient
             backgroundTxtBox.Text += $"Connected clients: {serverResponse.ConnectedClients}.\r\n";
             backgroundTxtBox.Text += "\r\n";
             ConnectionStatusLbl.Text = "Connected";
+            ConnectionStatusLbl.BackColor = Color.Green;
             backgroundTxtBox.SelectionStart = backgroundTxtBox.Text.Length;
             backgroundTxtBox.ScrollToCaret();
             await Task.Delay(5000);
@@ -263,6 +261,7 @@ namespace TestWinformClient
                     }
                     backgroundTxtBox.Text += $"Reattempting connection: ({i}/10).\r\n";
                     ConnectionStatusLbl.Text = "Reconnecting...";
+                    ConnectionStatusLbl.BackColor = Color.Orange;
                     backgroundTxtBox.SelectionStart = backgroundTxtBox.Text.Length;
                     backgroundTxtBox.ScrollToCaret();
 
@@ -285,6 +284,7 @@ namespace TestWinformClient
                         HealthCheckRunning = false;
                         debugTxtBox.Text += $"Error connecting to server.\r\n";
                         ConnectionStatusLbl.Text = "Connection lost";
+                        ConnectionStatusLbl.BackColor = Color.Red;
                         break;
                     }
                 }
@@ -301,6 +301,7 @@ namespace TestWinformClient
                     HealthCheckRunning = false;
                     debugTxtBox.Text += "Succsesfully disconnected from the server.\r\n";
                     ConnectionStatusLbl.Text = "No connection";
+                    ConnectionStatusLbl.BackColor = Color.White;
                     Cursor.Current = Cursors.Default;
                     return true;
                 }

@@ -35,9 +35,6 @@
             nameTxtBox = new TextBox();
             ServerReplyButton = new Button();
             debugTxtBox = new TextBox();
-            label3 = new Label();
-            portNumbersList = new ComboBox();
-            SetActivePortBtn = new Button();
             label4 = new Label();
             activePortLbl = new Label();
             label5 = new Label();
@@ -45,6 +42,8 @@
             IPTestBtn = new Button();
             tabcontrol = new TabControl();
             tabPage1 = new TabPage();
+            DisconnectBtn = new Button();
+            label7 = new Label();
             tabPage2 = new TabPage();
             UnixNameTxtBox = new TextBox();
             label6 = new Label();
@@ -55,6 +54,8 @@
             tabPage4 = new TabPage();
             tabPage5 = new TabPage();
             backgroundTxtBox = new TextBox();
+            label3 = new Label();
+            ConnectionStatusLbl = new Label();
             tabcontrol.SuspendLayout();
             tabPage1.SuspendLayout();
             tabPage2.SuspendLayout();
@@ -92,7 +93,7 @@
             // label2
             // 
             label2.AutoSize = true;
-            label2.Location = new Point(426, 100);
+            label2.Location = new Point(426, 191);
             label2.Name = "label2";
             label2.Size = new Size(72, 15);
             label2.TabIndex = 6;
@@ -100,14 +101,14 @@
             // 
             // nameTxtBox
             // 
-            nameTxtBox.Location = new Point(504, 96);
+            nameTxtBox.Location = new Point(504, 187);
             nameTxtBox.Name = "nameTxtBox";
             nameTxtBox.Size = new Size(100, 23);
             nameTxtBox.TabIndex = 5;
             // 
             // ServerReplyButton
             // 
-            ServerReplyButton.Location = new Point(610, 95);
+            ServerReplyButton.Location = new Point(610, 186);
             ServerReplyButton.Name = "ServerReplyButton";
             ServerReplyButton.Size = new Size(131, 23);
             ServerReplyButton.TabIndex = 4;
@@ -126,38 +127,11 @@
             debugTxtBox.Size = new Size(762, 246);
             debugTxtBox.TabIndex = 7;
             // 
-            // label3
-            // 
-            label3.AutoSize = true;
-            label3.Location = new Point(411, 71);
-            label3.Name = "label3";
-            label3.Size = new Size(87, 15);
-            label3.TabIndex = 8;
-            label3.Text = "Set Active Port:";
-            // 
-            // portNumbersList
-            // 
-            portNumbersList.FormattingEnabled = true;
-            portNumbersList.Location = new Point(504, 67);
-            portNumbersList.Name = "portNumbersList";
-            portNumbersList.Size = new Size(100, 23);
-            portNumbersList.TabIndex = 9;
-            // 
-            // SetActivePortBtn
-            // 
-            SetActivePortBtn.Location = new Point(610, 66);
-            SetActivePortBtn.Name = "SetActivePortBtn";
-            SetActivePortBtn.Size = new Size(131, 23);
-            SetActivePortBtn.TabIndex = 10;
-            SetActivePortBtn.Text = "Set Active Port ";
-            SetActivePortBtn.UseVisualStyleBackColor = true;
-            SetActivePortBtn.Click += SetActivePortBtn_Click;
-            // 
             // label4
             // 
             label4.AutoSize = true;
             label4.Font = new Font("Segoe UI", 15.75F, FontStyle.Bold, GraphicsUnit.Point);
-            label4.Location = new Point(6, 56);
+            label4.Location = new Point(6, 8);
             label4.Name = "label4";
             label4.Size = new Size(164, 30);
             label4.TabIndex = 11;
@@ -167,7 +141,7 @@
             // 
             activePortLbl.AutoSize = true;
             activePortLbl.Font = new Font("Segoe UI", 15.75F, FontStyle.Regular, GraphicsUnit.Point);
-            activePortLbl.Location = new Point(170, 60);
+            activePortLbl.Location = new Point(170, 9);
             activePortLbl.Name = "activePortLbl";
             activePortLbl.Size = new Size(0, 30);
             activePortLbl.TabIndex = 12;
@@ -206,21 +180,22 @@
             tabcontrol.Location = new Point(12, 287);
             tabcontrol.Name = "tabcontrol";
             tabcontrol.SelectedIndex = 0;
-            tabcontrol.Size = new Size(776, 151);
+            tabcontrol.Size = new Size(776, 253);
             tabcontrol.TabIndex = 16;
             // 
             // tabPage1
             // 
+            tabPage1.Controls.Add(ConnectionStatusLbl);
+            tabPage1.Controls.Add(label3);
+            tabPage1.Controls.Add(DisconnectBtn);
+            tabPage1.Controls.Add(label7);
             tabPage1.Controls.Add(activePortLbl);
             tabPage1.Controls.Add(IPTestBtn);
-            tabPage1.Controls.Add(SetActivePortBtn);
             tabPage1.Controls.Add(nameTxtBox);
             tabPage1.Controls.Add(label2);
             tabPage1.Controls.Add(label4);
-            tabPage1.Controls.Add(portNumbersList);
             tabPage1.Controls.Add(ServerReplyButton);
             tabPage1.Controls.Add(IPAddressTxtBox);
-            tabPage1.Controls.Add(label3);
             tabPage1.Controls.Add(label5);
             tabPage1.Controls.Add(label1);
             tabPage1.Controls.Add(portTxtBox);
@@ -228,10 +203,29 @@
             tabPage1.Location = new Point(4, 24);
             tabPage1.Name = "tabPage1";
             tabPage1.Padding = new Padding(3);
-            tabPage1.Size = new Size(768, 123);
+            tabPage1.Size = new Size(768, 225);
             tabPage1.TabIndex = 0;
             tabPage1.Text = "TCP Connections";
             tabPage1.UseVisualStyleBackColor = true;
+            // 
+            // DisconnectBtn
+            // 
+            DisconnectBtn.Location = new Point(501, 75);
+            DisconnectBtn.Name = "DisconnectBtn";
+            DisconnectBtn.Size = new Size(240, 23);
+            DisconnectBtn.TabIndex = 17;
+            DisconnectBtn.Text = "Disconnect From Server";
+            DisconnectBtn.UseVisualStyleBackColor = true;
+            DisconnectBtn.Click += DisconnectBtn_Click;
+            // 
+            // label7
+            // 
+            label7.AutoSize = true;
+            label7.Location = new Point(426, 79);
+            label7.Name = "label7";
+            label7.Size = new Size(69, 15);
+            label7.TabIndex = 16;
+            label7.Text = "Disconnect:";
             // 
             // tabPage2
             // 
@@ -242,7 +236,7 @@
             tabPage2.Location = new Point(4, 24);
             tabPage2.Name = "tabPage2";
             tabPage2.Padding = new Padding(3);
-            tabPage2.Size = new Size(768, 123);
+            tabPage2.Size = new Size(768, 225);
             tabPage2.TabIndex = 1;
             tabPage2.Text = "Unix Domain Sockets";
             tabPage2.UseVisualStyleBackColor = true;
@@ -287,7 +281,7 @@
             // 
             tabPage3.Location = new Point(4, 24);
             tabPage3.Name = "tabPage3";
-            tabPage3.Size = new Size(768, 123);
+            tabPage3.Size = new Size(768, 225);
             tabPage3.TabIndex = 2;
             tabPage3.Text = "Discovery";
             tabPage3.UseVisualStyleBackColor = true;
@@ -334,11 +328,30 @@
             backgroundTxtBox.Size = new Size(762, 246);
             backgroundTxtBox.TabIndex = 0;
             // 
+            // label3
+            // 
+            label3.AutoSize = true;
+            label3.Font = new Font("Segoe UI", 15.75F, FontStyle.Bold, GraphicsUnit.Point);
+            label3.Location = new Point(3, 64);
+            label3.Name = "label3";
+            label3.Size = new Size(198, 30);
+            label3.TabIndex = 18;
+            label3.Text = "Connection Status:";
+            // 
+            // ConnectionStatusLbl
+            // 
+            ConnectionStatusLbl.AutoSize = true;
+            ConnectionStatusLbl.Font = new Font("Segoe UI", 14.25F, FontStyle.Regular, GraphicsUnit.Point);
+            ConnectionStatusLbl.Location = new Point(196, 75);
+            ConnectionStatusLbl.Name = "ConnectionStatusLbl";
+            ConnectionStatusLbl.Size = new Size(0, 25);
+            ConnectionStatusLbl.TabIndex = 19;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(800, 450);
+            ClientSize = new Size(800, 552);
             Controls.Add(tabControl1);
             Controls.Add(tabcontrol);
             Name = "Form1";
@@ -365,9 +378,6 @@
         private TextBox nameTxtBox;
         private Button ServerReplyButton;
         private TextBox debugTxtBox;
-        private Label label3;
-        private ComboBox portNumbersList;
-        private Button SetActivePortBtn;
         private Label label4;
         private Label activePortLbl;
         private Label label5;
@@ -385,5 +395,9 @@
         private TabPage tabPage4;
         private TabPage tabPage5;
         private TextBox backgroundTxtBox;
+        private Button DisconnectBtn;
+        private Label label7;
+        private Label label3;
+        private Label ConnectionStatusLbl;
     }
 }

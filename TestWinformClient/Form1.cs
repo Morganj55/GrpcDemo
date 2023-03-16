@@ -1,12 +1,14 @@
 
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
+using System.Windows.Forms;
 using Grpc.Core;
 using Grpc.Health.V1;
 using Grpc.Net.Client;
 using TestWinformClient.Protos;
 using static System.Net.WebRequestMethods;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+using static TestWinformClient.Protos.Connections;
 using Status = Grpc.Core.Status;
 
 namespace TestWinformClient
@@ -16,19 +18,23 @@ namespace TestWinformClient
         public Form1()
         {
             InitializeComponent();
-            _succesfulTCPClients = new List<Connections.ConnectionsClient>();
-            _succesfulUnixClients = new List<Greeter.GreeterClient>();
+            SuccessfulUnixClients = new List<Greeter.GreeterClient>();
+            SuccessfulTcpClients = new Dictionary<string, bool>();
             //IPAddressTxtBox.Text = "192.168.1.160";
             portTxtBox.Text = "5001";
         }
 
         private Greeter.GreeterClient? GreeterClient { get; set; }
 
-        private List<Connections.ConnectionsClient> _succesfulTCPClients { get; set; }
+        private List<Greeter.GreeterClient> SuccessfulUnixClients { get; set; }
 
-        private List<Greeter.GreeterClient> _succesfulUnixClients { get; set; }
+        private Dictionary<string, bool> SuccessfulTcpClients { get; set; }
 
-        private string IPAddress { get; set; }
+        private string IpAddress { get; set; }
+
+        private bool Disconnected { get; set; }
+
+        private bool HealthCheckRunning { get; set; }
 
         private async void TestConnectionBtn_Click(object sender, EventArgs e)
         {
@@ -47,39 +53,60 @@ namespace TestWinformClient
             }
 
             Connections.ConnectionsClient? client;
-            if (UnableToFormConnection(portNum, out client))
+            GrpcChannel? channel;
+            if (UnableToFormConnection(portNum, out client, out channel))
             {
                 return;
             }
 
-            foreach (int item in portNumbersList.Items)
+            if (SuccessfulTcpClients.Count == 0)
             {
-                if (item == portNum)
-                {
-                    return;
-                }
+                SuccessfulTcpClients.Add(channel.ToString(), true);
             }
 
-            GreeterClient = new Greeter.GreeterClient(GrpcChannel.ForAddress($"http://{IPAddress}:{portNum}"));
-            _succesfulTCPClients.Add(client);
-            portNumbersList.Items.Add(portNum);
-            await EstablishHealthConnection(client);
+            if (!HealthCheckRunning)
+            {
+                if (SuccessfulTcpClients[channel.ToString()])
+                {
+                    GreeterClient = new Greeter.GreeterClient(GrpcChannel.ForAddress($"http://{IpAddress}:{portNum}"));
+                    debugTxtBox.Text += "Establishing health connection to server: check background services.\r\n";
+                    activePortLbl.Text = $"{IpAddress}:{portNum}";
+                    await EstablishHealthConnection(client);
+                    SuccessfulTcpClients[channel.ToString()] = false;
+                    return;
+                }
+
+                debugTxtBox.Text += "Re-establishing connection and health check.\r\n";
+                await EstablishHealthConnection(client);
+                return;
+            }
+
+            if (HealthCheckRunning)
+            {
+                GreeterClient = new Greeter.GreeterClient(GrpcChannel.ForAddress($"http://{IpAddress}:{portNum}"));
+                debugTxtBox.Text += "Already connected to server with health check running.\r\n";
+            }
+
         }
 
-        private bool UnableToFormConnection(int portNumber, out Connections.ConnectionsClient? client)
+        private bool UnableToFormConnection(int portNumber, out Connections.ConnectionsClient? client, out GrpcChannel? channel)
         {
             try
             {
-                var channel = GrpcChannel.ForAddress($"http://{IPAddress}:{portNumber}");
-                var testClient = new Connections.ConnectionsClient(channel);
+                var testChannel = GrpcChannel.ForAddress($"http://{IpAddress}:{portNumber}");
+                var testClient = new Connections.ConnectionsClient(testChannel);
 
                 var input = new TestRequest { };
                 Cursor.Current = Cursors.WaitCursor;
                 var reply = testClient.TestConnection(input);
                 Cursor.Current = Cursors.Default;
 
-                debugTxtBox.Text += $"{reply.ConnectionResponse}{portNumber}.\r\n";
+                if (!debugTxtBox.Text.Contains($"{reply.ConnectionResponse}{portNumber}."))
+                {
+                    debugTxtBox.Text += $"{reply.ConnectionResponse}{portNumber}.\r\n";
+                }
                 client = testClient;
+                channel = testChannel;
                 return false;
             }
             catch (Exception ex)
@@ -87,9 +114,12 @@ namespace TestWinformClient
                 Cursor.Current = Cursors.Default;
                 debugTxtBox.Text += $"The connection to port: {portNumber} was NOT SUCCESFUL.\r\n";
                 client = null;
+                channel = null;
                 return true;
             }
         }
+
+
 
         private void ServerReplyButton_Click(object sender, EventArgs e)
         {
@@ -99,25 +129,16 @@ namespace TestWinformClient
             }
 
             var reply = GreeterClient.SayHello(new HelloRequest { Name = nameTxtBox.Text });
-            debugTxtBox.Text += $"The server responded from port {portNumbersList.SelectedItem} with: {reply.Message}\r\n";
+            //debugTxtBox.Text += $"The server responded from port {portNumbersList.SelectedItem} with: {reply.Message}\r\n";
         }
 
-        private void SetActivePortBtn_Click(object sender, EventArgs e)
-        {
-            if (_succesfulTCPClients.Count == 0)
-            {
-                return;
-            }
-            debugTxtBox.Text += $"The active port has now been set to: {portNumbersList.SelectedItem}.\r\n";
-            activePortLbl.Text = $"{IPAddress}:{portNumbersList.SelectedItem}";
-        }
 
         private void IPTestBtn_Click(object sender, EventArgs e)
         {
             string iPAddress = IPAddressTxtBox.Text;
             if (string.IsNullOrEmpty(iPAddress))
             {
-                IPAddress = "localhost";
+                IpAddress = "localhost";
                 debugTxtBox.Text += "IP address is set to http://localhost.\r\n";
                 return;
             }
@@ -133,7 +154,7 @@ namespace TestWinformClient
                 {
                     debugTxtBox.Text += $"Ping from {iPAddress} was successful! Round-trip time: " +
                                         reply.RoundtripTime + "ms}.\r\n";
-                    IPAddress = iPAddress;
+                    IpAddress = iPAddress;
                 }
 
             }
@@ -158,7 +179,7 @@ namespace TestWinformClient
                 Cursor.Current = Cursors.Default;
                 var outputMessage = reply.ConnectionResponse;
                 outputMessage = outputMessage.Substring(0, outputMessage.Length - 7);
-                _succesfulUnixClients.Add(new Greeter.GreeterClient(channel));
+                SuccessfulUnixClients.Add(new Greeter.GreeterClient(channel));
                 debugTxtBox.Text += $"{outputMessage} Unix Socket: {SocketPath}.\r\n";
             }
             catch (Exception ex)
@@ -185,38 +206,113 @@ namespace TestWinformClient
 
         private void UnixGetServerReply_Click(object sender, EventArgs e)
         {
-            if (_succesfulUnixClients == null)
+            if (SuccessfulUnixClients == null)
             {
                 return;
             }
-            var client = _succesfulUnixClients[0];
+            var client = SuccessfulUnixClients[0];
             var reply = client.SayHello(new HelloRequest { Name = UnixNameTxtBox.Text });
             debugTxtBox.Text += $"The server responded from the Unix Socket with: {reply.Message}\r\n";
         }
 
         private async Task EstablishHealthConnection(Connections.ConnectionsClient client)
         {
+            int call = 0;
+            HealthCheckRunning = true;
             while (true)
             {
+                if (CheckForDisconnectionEvent())
+                {
+                    break;
+                }
                 try
                 {
-                    var serverResponse = await client.EstablishConnectionHealthCheckAsync(new ConnectionRequest());
-                    backgroundTxtBox.Text += $"Server connection is: Serving.\r\n";
-                    backgroundTxtBox.Text += $"Currently using License: {serverResponse.Licence}\r\n";
-                    backgroundTxtBox.Text += $"There are currently {serverResponse.ConnectedClients} clients.\r\n";
-                    backgroundTxtBox.Text += "\r\n";
-                   await Task.Delay(5000);
+                    await SendHealthCheckUpdate(client, call++);
                 }
                 catch (Exception e)
                 {
-                    debugTxtBox.Text += $"Error connecting to server. Please check the background services window.\r\n";
-                    //backgroundTxtBox.Text = $"{e}";
+                    await AttemptReconnection(client);
                     break;
                 }
             }
 
         }
 
+        private async Task SendHealthCheckUpdate(ConnectionsClient client, int call)
+        {
+            var serverResponse = await client.EstablishConnectionHealthCheckAsync(new ConnectionRequest());
+            backgroundTxtBox.Text += $"Server connection attempt ({call}) is: Serving.\r\n";
+            backgroundTxtBox.Text += $"Currently using License: {serverResponse.Licence}\r\n";
+            backgroundTxtBox.Text += $"Connected clients: {serverResponse.ConnectedClients}.\r\n";
+            backgroundTxtBox.Text += "\r\n";
+            ConnectionStatusLbl.Text = "Connected";
+            backgroundTxtBox.SelectionStart = backgroundTxtBox.Text.Length;
+            backgroundTxtBox.ScrollToCaret();
+            await Task.Delay(5000);
+        }
 
+        private async Task AttemptReconnection(ConnectionsClient client)
+        {
+            for (var i = 1; i < 11; i++)
+            {
+                try
+                {
+                    if (i == 1)
+                    {
+                        debugTxtBox.Text += "Lost server connection, attmpeting reconnection.\r\n";
+                    }
+                    backgroundTxtBox.Text += $"Reattempting connection: ({i}/10).\r\n";
+                    ConnectionStatusLbl.Text = "Reconnecting...";
+                    await Task.Delay(1000);
+                    var serverResponse =
+                        await client.EstablishConnectionHealthCheckAsync(new ConnectionRequest());
+                    backgroundTxtBox.Text += $"Connection reestablished.\r\n";
+                    backgroundTxtBox.Text += "\r\n";
+                    debugTxtBox.Text += "Connection reestablished.\r\n";
+                    await EstablishHealthConnection(client);
+                    break;
+                }
+                catch (Exception exception)
+                {
+                    if (i == 10)
+                    {
+                        HealthCheckRunning = false;
+                        debugTxtBox.Text += $"Error connecting to server.\r\n";
+                        ConnectionStatusLbl.Text = "Connection lost";
+                        break;
+                    }
+                }
+            }
+        }
+
+        private bool CheckForDisconnectionEvent()
+        {
+            if (Disconnected)
+            {
+                try
+                {
+                    Disconnected = false;
+                    HealthCheckRunning = false;
+                    debugTxtBox.Text += "Succsesfully disconnected from the server.\r\n";
+                    ConnectionStatusLbl.Text = "No connection";
+                    Cursor.Current = Cursors.Default;
+                    return true;
+                }
+                catch (Exception error)
+                {
+                    Cursor.Current = Cursors.Default;
+                    debugTxtBox.Text += "Error disconnecting.\r\n";
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private void DisconnectBtn_Click(object sender, EventArgs e)
+        {
+            Disconnected = true;
+            Cursor.Current = Cursors.WaitCursor;
+        }
     }
 }

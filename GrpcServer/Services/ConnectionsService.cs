@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System.ComponentModel;
+using System.Diagnostics;
 using Grpc.Core;
 using System.Timers;
 using GrpcServer;
@@ -31,9 +32,6 @@ namespace GrpcServer.Services
             _addressConnectionCount = new Dictionary<string, int>();
         }
 
-        private bool _connected { get; set; }
-
-
 
         public override Task<TestReply> TestConnection(TestRequest request, ServerCallContext context)
         {
@@ -54,51 +52,78 @@ namespace GrpcServer.Services
             ConnectionRequest request,
             ServerCallContext serverCallContext)
         {
+            //assign the IP address from the meta data
             var iPAddress = serverCallContext.Peer;
-            if (_connectedClients == 0 || _clientIpAddresses.Count == 0)
+
+            //Assigns IP Addresses to incoming client,
+            bool licenseWasAssigned = AssignLicense(iPAddress);
+
+            ConnectionResponse connectionResponse;
+            if (licenseWasAssigned)
             {
-                AssignLicense(iPAddress);
+                //Creates the new outgoing Connection response variable used to send back data in the GRPC call.
+                connectionResponse = new ConnectionResponse
+                {
+                    Licence = _addressLicensePairs[iPAddress],
+                    ConnectedClients = _connectedClients
+                };
+
+                //Create the response that will be sent back to the client 
+                var response = await Task.FromResult(connectionResponse);
+
+                //Starts the checks for continual health requests from the client, will only start checks once per IP address
+                if (_addressConnectionCount[iPAddress] == 0)
+                {
+                    Task.Run(async () => await CheckForIncomingConnections(iPAddress));
+                }
+                _addressConnectionCount[iPAddress]++;
+                return response;
+
+            }
+            else
+            {
+                connectionResponse = new ConnectionResponse
+                {
+                    Licence = "No more licenses available. You do not have permission to use the software.",
+                    ConnectedClients = _connectedClients
+                };
+                return await Task.FromResult(connectionResponse);
             }
 
-            if (!_clientIpAddresses.Contains(iPAddress))
-            {
-                AssignLicense(iPAddress);
-            }
-
-            var connectionResponse = new ConnectionResponse
-            {
-                Licence = _addressLicensePairs[iPAddress],
-                ConnectedClients = _connectedClients
-            };
-
-            
-            var response = await Task.FromResult(connectionResponse);
-
-            if (_addressConnectionCount[iPAddress] == 0)
-            {
-                Task.Run(async () => await CheckForIncomingConnections(iPAddress));
-            }
-            _addressConnectionCount[iPAddress]++;
-            return response;
         }
 
-        private void AssignLicense(string iPAddress)
+        private bool AssignLicense(string iPAddress)
         {
-            _clientIpAddresses.Add(iPAddress);
-            _connectedClients++;
-            if (_licenses.Count == 0)
+            if (_connectedClients == 0 || _clientIpAddresses.Count == 0)
             {
-                //There are no more licenses to give out, write it into the response stream
-                return;
+                //First new client is always assigned a new license
+                UpdateLicenseInfo(iPAddress);
+                return true;
             }
-
             if (_addressLicensePairs.ContainsKey(iPAddress))
             {
                 //A license has already been assigned to this IP Address 
-                return;
+                return true;
             }
 
-            //Add the IP Address : license pair and remove the used license from the available list 
+            if (!_clientIpAddresses.Contains(iPAddress) && _licenses.Count != 0)
+            {
+                //New clients will be assigned licenses if they are available 
+                UpdateLicenseInfo(iPAddress);
+                return true;
+            }
+
+
+            //There are no more licenses to give out, write it into the response stream
+            Debug.WriteLine("No more licenses available.");
+            return false;
+
+        }
+
+        private void UpdateLicenseInfo(string iPAddress)
+        {
+            _clientIpAddresses.Add(iPAddress);
+            _connectedClients++;
             _addressLicensePairs.Add(iPAddress, _licenses[_licenses.Count - 1]);
             _licenses.RemoveAt(_licenses.Count - 1);
             _addressConnectionCount.Add(iPAddress, 0);
@@ -109,9 +134,12 @@ namespace GrpcServer.Services
         {
             while (true)
             {
-                var startConnectionCount = _addressConnectionCount[iPAddress];
+                //preDelayConnection count is set to the IP address specific connection count
+                //during Task.Delay, the IP address specific connection count will be incremented (every 5 seconds)
+                //if it hasnt been incremented, both numbers will be the same which means the client has disconnected
+                var preDelayConnectionCount = _addressConnectionCount[iPAddress];
                 await Task.Delay(10000);
-                if (startConnectionCount < _addressConnectionCount[iPAddress])
+                if (preDelayConnectionCount < _addressConnectionCount[iPAddress])
                 {
                     continue;
                 }
@@ -119,11 +147,12 @@ namespace GrpcServer.Services
                 {
                     //remove last ip address and reclaim license
                     Debug.WriteLine($"Server has lost connection to client with IP address: {iPAddress}, reclaiming assigned license: {_addressLicensePairs[iPAddress]}");
-                    _addressConnectionCount[iPAddress] = 0;
-                    _connectedClients--;
+                    //_addressConnectionCount[iPAddress] = 0;
+                    _addressConnectionCount.Remove(iPAddress);
                     _clientIpAddresses.Remove(iPAddress);
                     _licenses.Add(_addressLicensePairs[iPAddress]);
                     _addressLicensePairs.Remove(iPAddress);
+                    _connectedClients--;
                     break;
                 }
 

@@ -50,15 +50,14 @@
             UnixGetServerReply = new Button();
             UnixSocketBtn = new Button();
             tabPage2 = new TabPage();
+            DownloadFilesComboBox = new ComboBox();
+            label10 = new Label();
+            GetFilesBtn = new Button();
             ChosenFilePathLbl = new Label();
-            button4 = new Button();
-            button3 = new Button();
+            DownloadFileBtn = new Button();
             UploadFileBtn = new Button();
-            textBox1 = new TextBox();
-            label11 = new Label();
             label12 = new Label();
             OpenFileBtn = new Button();
-            label10 = new Label();
             label9 = new Label();
             tabPage3 = new TabPage();
             ConnectionStatusLbl = new Label();
@@ -217,7 +216,7 @@
             tabPage1.Padding = new Padding(3);
             tabPage1.Size = new Size(768, 190);
             tabPage1.TabIndex = 0;
-            tabPage1.Text = "TCP Connections";
+            tabPage1.Text = "Connections";
             tabPage1.UseVisualStyleBackColor = true;
             // 
             // label7
@@ -286,15 +285,14 @@
             // 
             // tabPage2
             // 
+            tabPage2.Controls.Add(DownloadFilesComboBox);
+            tabPage2.Controls.Add(label10);
+            tabPage2.Controls.Add(GetFilesBtn);
             tabPage2.Controls.Add(ChosenFilePathLbl);
-            tabPage2.Controls.Add(button4);
-            tabPage2.Controls.Add(button3);
+            tabPage2.Controls.Add(DownloadFileBtn);
             tabPage2.Controls.Add(UploadFileBtn);
-            tabPage2.Controls.Add(textBox1);
-            tabPage2.Controls.Add(label11);
             tabPage2.Controls.Add(label12);
             tabPage2.Controls.Add(OpenFileBtn);
-            tabPage2.Controls.Add(label10);
             tabPage2.Controls.Add(label9);
             tabPage2.Location = new Point(4, 24);
             tabPage2.Name = "tabPage2";
@@ -304,31 +302,50 @@
             tabPage2.Text = "File Transfer";
             tabPage2.UseVisualStyleBackColor = true;
             // 
+            // DownloadFilesComboBox
+            // 
+            DownloadFilesComboBox.FormattingEnabled = true;
+            DownloadFilesComboBox.Location = new Point(407, 66);
+            DownloadFilesComboBox.Name = "DownloadFilesComboBox";
+            DownloadFilesComboBox.Size = new Size(219, 23);
+            DownloadFilesComboBox.TabIndex = 30;
+            // 
+            // label10
+            // 
+            label10.AutoSize = true;
+            label10.Location = new Point(407, 36);
+            label10.Name = "label10";
+            label10.Size = new Size(110, 15);
+            label10.TabIndex = 29;
+            label10.Text = "Get Server Files List:";
+            // 
+            // GetFilesBtn
+            // 
+            GetFilesBtn.Location = new Point(523, 32);
+            GetFilesBtn.Name = "GetFilesBtn";
+            GetFilesBtn.Size = new Size(235, 23);
+            GetFilesBtn.TabIndex = 28;
+            GetFilesBtn.Text = "Request Available Download Files";
+            GetFilesBtn.UseVisualStyleBackColor = true;
+            GetFilesBtn.Click += GetFilesBtnClick;
+            // 
             // ChosenFilePathLbl
             // 
             ChosenFilePathLbl.AutoSize = true;
-            ChosenFilePathLbl.Location = new Point(123, 168);
+            ChosenFilePathLbl.Location = new Point(117, 92);
             ChosenFilePathLbl.Name = "ChosenFilePathLbl";
             ChosenFilePathLbl.Size = new Size(0, 15);
             ChosenFilePathLbl.TabIndex = 27;
             // 
-            // button4
+            // DownloadFileBtn
             // 
-            button4.Location = new Point(463, 32);
-            button4.Name = "button4";
-            button4.Size = new Size(299, 23);
-            button4.TabIndex = 26;
-            button4.Text = "Update Files";
-            button4.UseVisualStyleBackColor = true;
-            // 
-            // button3
-            // 
-            button3.Location = new Point(19, 132);
-            button3.Name = "button3";
-            button3.Size = new Size(351, 23);
-            button3.TabIndex = 25;
-            button3.Text = "Download File";
-            button3.UseVisualStyleBackColor = true;
+            DownloadFileBtn.Location = new Point(632, 65);
+            DownloadFileBtn.Name = "DownloadFileBtn";
+            DownloadFileBtn.Size = new Size(126, 23);
+            DownloadFileBtn.TabIndex = 25;
+            DownloadFileBtn.Text = "Download File";
+            DownloadFileBtn.UseVisualStyleBackColor = true;
+            DownloadFileBtn.Click += DownloadFileBtn_Click;
             // 
             // UploadFileBtn
             // 
@@ -340,30 +357,14 @@
             UploadFileBtn.UseVisualStyleBackColor = true;
             UploadFileBtn.Click += UploadFileBtn_Click;
             // 
-            // textBox1
-            // 
-            textBox1.Location = new Point(167, 99);
-            textBox1.Name = "textBox1";
-            textBox1.Size = new Size(203, 23);
-            textBox1.TabIndex = 23;
-            // 
-            // label11
-            // 
-            label11.AutoSize = true;
-            label11.Location = new Point(386, 36);
-            label11.Name = "label11";
-            label11.Size = new Size(71, 15);
-            label11.TabIndex = 20;
-            label11.Text = "Update Files";
-            // 
             // label12
             // 
             label12.AutoSize = true;
             label12.Location = new Point(19, 36);
             label12.Name = "label12";
-            label12.Size = new Size(116, 15);
+            label12.Size = new Size(117, 15);
             label12.TabIndex = 22;
-            label12.Text = "Select File to Stream:";
+            label12.Text = "Select File to Upload:";
             // 
             // OpenFileBtn
             // 
@@ -375,19 +376,10 @@
             OpenFileBtn.UseVisualStyleBackColor = true;
             OpenFileBtn.Click += OpenFileBtn_Click;
             // 
-            // label10
-            // 
-            label10.AutoSize = true;
-            label10.Location = new Point(19, 102);
-            label10.Name = "label10";
-            label10.Size = new Size(142, 15);
-            label10.TabIndex = 1;
-            label10.Text = "Request File From Server: ";
-            // 
             // label9
             // 
             label9.AutoSize = true;
-            label9.Location = new Point(19, 168);
+            label9.Location = new Point(19, 92);
             label9.Name = "label9";
             label9.Size = new Size(98, 15);
             label9.TabIndex = 0;
@@ -521,15 +513,14 @@
         private Label ConnectionStatusLbl;
         private Label label7;
         private Label label8;
-        private Label label11;
-        private Label label10;
         private Label label9;
-        private Button button4;
-        private Button button3;
+        private Button DownloadFileBtn;
         private Button UploadFileBtn;
-        private TextBox textBox1;
         private Label label12;
         private Button OpenFileBtn;
         private Label ChosenFilePathLbl;
+        private ComboBox DownloadFilesComboBox;
+        private Label label10;
+        private Button GetFilesBtn;
     }
 }

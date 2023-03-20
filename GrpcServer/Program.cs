@@ -53,6 +53,29 @@ foreach (var file in Directory.EnumerateFiles(folderPath))
 }
 
 
+DriveInfo cDrive = new DriveInfo("C");
+string cDriveFolder = cDrive.RootDirectory.FullName;
+string dataFolder = Path.Combine(cDriveFolder,"GRPCTestData");
+if (!Directory.Exists(dataFolder))
+{
+    // Create the folder
+    Directory.CreateDirectory(dataFolder);
+    Console.WriteLine("Folder created successfully.");
+}
+else
+{
+    Console.WriteLine("Folder already exists.");
+}
+
+foreach (var file in Directory.EnumerateFiles(dataFolder))
+{
+    if (Path.GetExtension(file) == ".txt")
+    {
+        File.Delete(file);
+    }
+}
+
+
 
 if (File.Exists(socketPath))
 {

@@ -44,6 +44,8 @@ namespace TestWinformClient
 
         private string FileUploadPath { get; set; }
 
+        private List<string> AvailableServerFilesToDownload { get; set; }
+
         private async void TestConnectionBtn_Click(object sender, EventArgs e)
         {
             var port = portTxtBox.Text;
@@ -367,6 +369,8 @@ namespace TestWinformClient
         {
             Disconnected = true;
             Cursor.Current = Cursors.WaitCursor;
+            debugTxtBox.Text += "Attempting to disconnect, please wait...\r\n";
+
         }
 
         private void OpenFileBtn_Click(object sender, EventArgs e)
@@ -395,32 +399,122 @@ namespace TestWinformClient
             var stream = CurrentFileStreamClient.UploadFileToServer();
 
             ////Read the file data and send it in chunks
-             var buffer = new byte[8192];
+            debugTxtBox.Text += "File upload started...\r\n";
+            var buffer = new byte[8192];
             using (var inputStream = File.OpenRead(FileUploadPath))
             {
                 int bytesRead;
                 while ((bytesRead = await inputStream.ReadAsync(buffer, 0, buffer.Length)) > 0)
                 {
+                    Cursor.Current = Cursors.WaitCursor;
                     await stream.RequestStream.WriteAsync(new FileData { Data = ByteString.CopyFrom(buffer, 0, bytesRead) });
                 }
 
             }
 
-
             // Signal the end of the stream
             await stream.RequestStream.CompleteAsync();
+            Cursor.Current = Cursors.Default;
 
             // Wait for the server to respond
             var response = await stream.ResponseAsync;
-           
+
 
             if (response.Success)
             {
-                debugTxtBox.Text += "File successfully sent to the server where it was downloaded.\r\n";
+                debugTxtBox.Text += "File successfully uploaded.\r\n";
             }
             else
             {
                 debugTxtBox.Text += "File upload unsuccesfull.\r\n";
+            }
+        }
+
+        private async void GetFilesBtnClick(object sender, EventArgs e)
+        {
+            debugTxtBox.Text += "Getting files from server, please wait.\r\n";
+
+            try
+            {
+                using var stream = CurrentFileStreamClient.GetServerFilesList(new ServerFilesRequest());
+                AvailableServerFilesToDownload = new List<string>();
+                DownloadFilesComboBox.Items.Clear();
+
+                while (await stream.ResponseStream.MoveNext())
+                {
+                    AvailableServerFilesToDownload.Add(stream.ResponseStream.Current.FilePath);
+
+                }
+
+                foreach (var file in AvailableServerFilesToDownload)
+                {
+                    DownloadFilesComboBox.Items.Add(Path.GetFileName(file));
+                }
+                debugTxtBox.Text += "Files are available to download.\r\n";
+            }
+            catch (Exception ex)
+            {
+                debugTxtBox.Text += "Error retrieving files.\r\n";
+            }
+
+
+        }
+
+        private async void DownloadFileBtn_Click(object sender, EventArgs e)
+        {
+            if (DownloadFilesComboBox.Items.Count == 0)
+            {
+                return;
+            }
+            var serverDownloadFilePath = AvailableServerFilesToDownload[DownloadFilesComboBox.SelectedIndex];
+            // create a new SaveFileDialog
+            SaveFileDialog saveFileDialog = new SaveFileDialog();
+
+            // set the initial directory and file name
+            saveFileDialog.InitialDirectory = @"C:\Users\johns\Documents\Training projects\Networking\TestClientDownload";
+            saveFileDialog.FileName = "myFile.txt";
+            saveFileDialog.DefaultExt = ".txt";
+
+            // configure the dialog to only allow the user to select a folder
+            saveFileDialog.CheckFileExists = false;
+            saveFileDialog.CheckPathExists = false;
+
+            // display the dialog and wait for the user to select a folder
+            if (saveFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                // get the selected folder path
+                string folderPath = Path.GetDirectoryName(saveFileDialog.FileName);
+
+                // download the file into the selected folder path
+                // ...
+                try
+                {
+                    Cursor.Current = Cursors.WaitCursor;
+                    debugTxtBox.Text += "File download started...\r\n";
+                    using var stream = CurrentFileStreamClient.DownloadFileFromServer(
+                        new FileDataRequest { FileName = serverDownloadFilePath }
+                        );
+
+                    using (var outputStream = new FileStream(Path.Combine(folderPath, saveFileDialog.FileName), FileMode.Create))
+                    {
+                        while (await stream.ResponseStream.MoveNext())
+                        {
+                            Cursor.Current = Cursors.WaitCursor;
+                            var fileBytes = stream.ResponseStream.Current;
+                            await outputStream.WriteAsync(fileBytes.Data.ToByteArray());
+
+                        }
+                    }
+
+                    debugTxtBox.Text += "File successfully downloaded.\r\n";
+                    Cursor.Current = Cursors.Default;
+
+                }
+                catch (Exception ex)
+                {
+                    debugTxtBox.Text += "Error downloading file.\r\n";
+                    Cursor.Current = Cursors.Default;
+                }
             }
         }
     }

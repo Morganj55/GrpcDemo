@@ -1,7 +1,10 @@
 
+using System.IO;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
+using System.Threading.Channels;
 using System.Windows.Forms;
+using Google.Protobuf;
 using Grpc.Core;
 using Grpc.Health.V1;
 using Grpc.Net.Client;
@@ -9,6 +12,7 @@ using TestWinformClient.Protos;
 using static System.Net.WebRequestMethods;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using static TestWinformClient.Protos.Connections;
+using File = System.IO.File;
 using Status = Grpc.Core.Status;
 
 namespace TestWinformClient
@@ -30,11 +34,15 @@ namespace TestWinformClient
 
         private Dictionary<string, bool> SuccessfulTcpClients { get; set; }
 
+        private FileStreaming.FileStreamingClient CurrentFileStreamClient { get; set; }
+
         private string IpAddress { get; set; }
 
         private bool Disconnected { get; set; }
 
         private bool HealthCheckRunning { get; set; }
+
+        private string FileUploadPath { get; set; }
 
         private async void TestConnectionBtn_Click(object sender, EventArgs e)
         {
@@ -107,6 +115,7 @@ namespace TestWinformClient
                 }
                 client = testClient;
                 channel = testChannel;
+                CurrentFileStreamClient = new FileStreaming.FileStreamingClient(channel);
                 return false;
             }
             catch (Exception ex)
@@ -162,12 +171,13 @@ namespace TestWinformClient
 
         }
 
-        private void UnixSocketBtn_Click(object sender, EventArgs e)
+        private async void UnixSocketBtn_Click(object sender, EventArgs e)
         {
-            string SocketPath = Path.Combine(Path.GetTempPath(), "socket.tmp");
-            var channel = CreateChannel(SocketPath);
+            var SocketPath = ReadUnixSocketFromConfigFile();
+
             try
             {
+                var channel = CreateChannel(SocketPath);
                 var testClient = new Connections.ConnectionsClient(channel);
                 var input = new TestRequest { };
                 Cursor.Current = Cursors.WaitCursor;
@@ -176,14 +186,50 @@ namespace TestWinformClient
                 Cursor.Current = Cursors.Default;
                 var outputMessage = reply.ConnectionResponse;
                 outputMessage = outputMessage.Substring(0, outputMessage.Length - 7);
+
                 SuccessfulUnixClients.Add(new Greeter.GreeterClient(channel));
+                CurrentFileStreamClient = new FileStreaming.FileStreamingClient(channel);
+
                 debugTxtBox.Text += $"{outputMessage} Unix Socket: {SocketPath}.\r\n";
+                activePortLbl.Text = SocketPath;
+                await EstablishHealthConnection(testClient);
             }
             catch (Exception ex)
             {
-                debugTxtBox.Text += $"Unable to connect to Unix Socket: {SocketPath}.\r\n";
+                debugTxtBox.Text += $"Unable to connect to Unix Socket.\r\n";
             }
 
+        }
+
+        private static string? ReadUnixSocketFromConfigFile()
+        {
+            string filePath = Path.GetTempPath() + Path.Combine("GRPCUnixSocket", "config.txt");
+            string SocketPath = null;
+            try
+            {
+                if (File.Exists(Path.GetTempPath() + Path.Combine("GRPCUnixSocket", "config.txt")))
+                {
+                    // Open the file for reading
+                    StreamReader sr = new StreamReader(filePath);
+
+                    // Read the file line by line
+                    string line;
+                    while ((line = sr.ReadLine()) != null)
+                    {
+                        SocketPath = line;
+                    }
+
+                    // Close the file
+                    sr.Close();
+                }
+            }
+            catch (Exception exception)
+            {
+                Console.WriteLine("File not found.");
+                SocketPath = null;
+            }
+
+            return SocketPath;
         }
 
         public static GrpcChannel CreateChannel(string SocketPath)
@@ -220,6 +266,7 @@ namespace TestWinformClient
             {
                 if (DisconnectionEventFired())
                 {
+                    activePortLbl.Text = "";
                     break;
                 }
                 try
@@ -320,6 +367,61 @@ namespace TestWinformClient
         {
             Disconnected = true;
             Cursor.Current = Cursors.WaitCursor;
+        }
+
+        private void OpenFileBtn_Click(object sender, EventArgs e)
+        {
+            // Create a new instance of the OpenFileDialog class
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+
+            // Set the initial directory
+            openFileDialog.InitialDirectory = @"C:\Users\johns\Documents\Training projects\Networking\TestData";
+
+            // Set the filter for the file types to display
+            openFileDialog.Filter = "Text Files|*.txt|All Files|*.*";
+
+            // Show the dialog and wait for the user to choose a file
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                // Get the selected file path
+                string filePath = openFileDialog.FileName;
+                ChosenFilePathLbl.Text = filePath;
+                FileUploadPath = filePath;
+            }
+        }
+
+        private async void UploadFileBtn_Click(object sender, EventArgs e)
+        {
+            var stream = CurrentFileStreamClient.UploadFileToServer();
+
+            ////Read the file data and send it in chunks
+             var buffer = new byte[8192];
+            using (var inputStream = File.OpenRead(FileUploadPath))
+            {
+                int bytesRead;
+                while ((bytesRead = await inputStream.ReadAsync(buffer, 0, buffer.Length)) > 0)
+                {
+                    await stream.RequestStream.WriteAsync(new FileData { Data = ByteString.CopyFrom(buffer, 0, bytesRead) });
+                }
+
+            }
+
+
+            // Signal the end of the stream
+            await stream.RequestStream.CompleteAsync();
+
+            // Wait for the server to respond
+            var response = await stream.ResponseAsync;
+           
+
+            if (response.Success)
+            {
+                debugTxtBox.Text += "File successfully sent to the server where it was downloaded.\r\n";
+            }
+            else
+            {
+                debugTxtBox.Text += "File upload unsuccesfull.\r\n";
+            }
         }
     }
 }

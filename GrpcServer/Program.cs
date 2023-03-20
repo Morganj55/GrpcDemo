@@ -15,9 +15,45 @@ var builder = WebApplication.CreateBuilder(new WebApplicationOptions
         ? AppContext.BaseDirectory
         : default
 });
+static string GenerateRandomString(int length)
+{
+    const string Chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    var random = new Random();
+    return new string(Enumerable.Repeat(Chars, length)
+        .Select(s => s[random.Next(s.Length)]).ToArray());
+}
+
+string folderPath = $"{Path.GetTempPath()}GRPCUnixSocket";
+if (!Directory.Exists(folderPath))
+{
+    // Create the folder
+    Directory.CreateDirectory(folderPath);
+    Console.WriteLine("Folder created successfully.");
+}
+else
+{
+    Console.WriteLine("Folder already exists.");
+}
+
+string filePath = Path.Combine(folderPath, "config.txt");
+string socketPath;
+using (StreamWriter streamWriter = File.CreateText(filePath))
+{
+    socketPath = Path.Combine(folderPath, GenerateRandomString(5) + ".tmp");
+    streamWriter.Write(socketPath);
+    streamWriter.Close();
+}
+
+foreach (var file in Directory.EnumerateFiles(folderPath))
+{
+    if (Path.GetExtension(file) == ".tmp")
+    {
+        File.Delete(file);
+    }
+}
 
 
-var socketPath = Path.Combine(Path.GetTempPath(), "socket.tmp");
+
 if (File.Exists(socketPath))
 {
     File.Delete(socketPath);
@@ -49,8 +85,8 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 app.MapGrpcService<GreeterService>();
 app.MapGrpcService<ConnectionsService>();
-//app.UseHttpsRedirection();
-//app.MapControllers();
+app.MapGrpcService<FileStreamingService>();
+
 app.MapGet("/", () => "Communication with gRPC endpoints must be made through a gRPC client. To learn how to create a client, visit: https://go.microsoft.com/fwlink/?linkid=2086909");
 
 app.Run();

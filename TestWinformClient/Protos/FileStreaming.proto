@@ -1,0 +1,25 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "TestWinformClient.Protos";
+
+
+// The greeting service definition.
+service FileStreaming {
+  // Sends a greeting
+  rpc UploadFileToServer (stream FileData) returns (SuccessResponse);
+  rpc DownloadFileFromServer (FileDataRequest) returns (stream FileData);
+  rpc BidirectionalStream (stream FileData) returns (stream FileData);
+}
+
+message FileData {
+	bytes data = 1;
+}
+
+message SuccessResponse {
+	bool success = 1;
+}
+
+message FileDataRequest{
+	string fileName = 1;
+}
+

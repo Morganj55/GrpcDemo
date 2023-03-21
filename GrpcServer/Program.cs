@@ -1,3 +1,6 @@
+using System.Net;
+using System.Net.Sockets;
+using System.Text;
 using GrpcServer.Services;
 using Grpc.AspNetCore.Server;
 using Microsoft.AspNetCore.Builder;
@@ -75,6 +78,27 @@ foreach (var file in Directory.EnumerateFiles(dataFolder))
     }
 }
 
+async void StartServer(int portNumber)
+{
+    UdpClient server = new UdpClient(portNumber);
+    server.EnableBroadcast = true;
+
+    while (true)
+    {
+        UdpReceiveResult receiveResult = await server.ReceiveAsync();
+
+        byte[] discoveryMessage = receiveResult.Buffer;
+
+        // Handle the discovery message and send a response
+
+        byte[] serverInfo = Encoding.ASCII.GetBytes("SERVER_INFO");
+        await server.SendAsync(serverInfo, serverInfo.Length, receiveResult.RemoteEndPoint);
+    }
+}
+
+
+int portNumber = 8101;
+Task.Run(() => StartServer(portNumber));
 
 
 if (File.Exists(socketPath))
@@ -111,8 +135,25 @@ app.MapGrpcService<ConnectionsService>();
 app.MapGrpcService<FileStreamingService>();
 
 app.MapGet("/", () => "Communication with gRPC endpoints must be made through a gRPC client. To learn how to create a client, visit: https://go.microsoft.com/fwlink/?linkid=2086909");
-
-app.Run();
 WriteLine("Server has started and is listening:");
+app.Run();
 
+
+//const int portNumber = 8101;
+//Socket serverSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+//IPEndPoint localEndpoint = new IPEndPoint(IPAddress.Any, portNumber);
+//serverSocket.Bind(localEndpoint);
+
+//while (true)
+//{
+//    byte[] buffer = new byte[1024];
+//    EndPoint clientEndpoint = new IPEndPoint(IPAddress.Any, 0);
+//    int bytesReceived = serverSocket.ReceiveFrom(buffer, ref clientEndpoint);
+//    string discoveryMessage = Encoding.ASCII.GetString(buffer, 0, bytesReceived);
+
+//    // Handle the discovery message and send a response
+
+//    byte[] serverInfo = Encoding.ASCII.GetBytes("SERVER_INFO");
+//    serverSocket.SendTo(serverInfo, clientEndpoint);
+//}
 

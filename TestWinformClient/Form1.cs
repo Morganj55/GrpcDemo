@@ -1,7 +1,9 @@
 
 using System.IO;
+using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
+using System.Text;
 using System.Threading.Channels;
 using System.Windows.Forms;
 using Google.Protobuf;
@@ -516,6 +518,38 @@ namespace TestWinformClient
                     Cursor.Current = Cursors.Default;
                 }
             }
+        }
+
+        private void DiscoverServersBtn_Click(object sender, EventArgs e)
+        {
+            const int portNumber = 8101;
+            Socket clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+            clientSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Broadcast, 1);
+            //clientSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.AcceptConnection, 1);
+
+            byte[] discoveryPacket = Encoding.ASCII.GetBytes("DISCOVER");
+            IPEndPoint broadcastEndpoint = new IPEndPoint(IPAddress.Broadcast, portNumber);
+            clientSocket.SendTo(discoveryPacket, broadcastEndpoint);
+
+            byte[] responseBuffer = new byte[1024];
+            EndPoint serverEndpoint = new IPEndPoint(IPAddress.Any, 0);
+            int bytesRead = clientSocket.ReceiveFrom(responseBuffer, ref serverEndpoint);
+            string serverResponse = Encoding.ASCII.GetString(responseBuffer, 0, bytesRead);
+            List<string> serverResponses = new List<string>();
+            serverResponses.Add(serverResponse);
+
+            debugTxtBox.Text += $"There are {serverResponses.Count} servers running.\r\n";
+
+            foreach (var server in serverResponses)
+            {
+                IPEndPoint serverIpEndpoint = (IPEndPoint)serverEndpoint;
+                IPAddress serverIpAddress = serverIpEndpoint.Address;
+
+                debugTxtBox.Text += $"Found IP addresses running the server are:{serverIpAddress.ToString()}\r\n";
+            }
+
+
+
         }
     }
 }

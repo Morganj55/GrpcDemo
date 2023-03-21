@@ -66,9 +66,12 @@
             tabPage4 = new TabPage();
             tabPage5 = new TabPage();
             backgroundTxtBox = new TextBox();
+            DiscoverServersBtn = new Button();
+            label11 = new Label();
             tabcontrol.SuspendLayout();
             tabPage1.SuspendLayout();
             tabPage2.SuspendLayout();
+            tabPage3.SuspendLayout();
             tabControl1.SuspendLayout();
             tabPage4.SuspendLayout();
             tabPage5.SuspendLayout();
@@ -387,6 +390,8 @@
             // 
             // tabPage3
             // 
+            tabPage3.Controls.Add(label11);
+            tabPage3.Controls.Add(DiscoverServersBtn);
             tabPage3.Location = new Point(4, 24);
             tabPage3.Name = "tabPage3";
             tabPage3.Size = new Size(768, 190);
@@ -455,6 +460,25 @@
             backgroundTxtBox.Size = new Size(762, 136);
             backgroundTxtBox.TabIndex = 0;
             // 
+            // DiscoverServersBtn
+            // 
+            DiscoverServersBtn.Location = new Point(169, 15);
+            DiscoverServersBtn.Name = "DiscoverServersBtn";
+            DiscoverServersBtn.Size = new Size(162, 23);
+            DiscoverServersBtn.TabIndex = 0;
+            DiscoverServersBtn.Text = "Discover";
+            DiscoverServersBtn.UseVisualStyleBackColor = true;
+            DiscoverServersBtn.Click += DiscoverServersBtn_Click;
+            // 
+            // label11
+            // 
+            label11.AutoSize = true;
+            label11.Location = new Point(3, 19);
+            label11.Name = "label11";
+            label11.Size = new Size(160, 15);
+            label11.TabIndex = 1;
+            label11.Text = "Discover Servers on Network:";
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -473,6 +497,8 @@
             tabPage1.PerformLayout();
             tabPage2.ResumeLayout(false);
             tabPage2.PerformLayout();
+            tabPage3.ResumeLayout(false);
+            tabPage3.PerformLayout();
             tabControl1.ResumeLayout(false);
             tabPage4.ResumeLayout(false);
             tabPage4.PerformLayout();
@@ -522,5 +548,7 @@
         private ComboBox DownloadFilesComboBox;
         private Label label10;
         private Button GetFilesBtn;
+        private Label label11;
+        private Button DiscoverServersBtn;
     }
 }

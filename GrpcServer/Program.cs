@@ -138,22 +138,3 @@ app.MapGet("/", () => "Communication with gRPC endpoints must be made through a 
 WriteLine("Server has started and is listening:");
 app.Run();
 
-
-//const int portNumber = 8101;
-//Socket serverSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-//IPEndPoint localEndpoint = new IPEndPoint(IPAddress.Any, portNumber);
-//serverSocket.Bind(localEndpoint);
-
-//while (true)
-//{
-//    byte[] buffer = new byte[1024];
-//    EndPoint clientEndpoint = new IPEndPoint(IPAddress.Any, 0);
-//    int bytesReceived = serverSocket.ReceiveFrom(buffer, ref clientEndpoint);
-//    string discoveryMessage = Encoding.ASCII.GetString(buffer, 0, bytesReceived);
-
-//    // Handle the discovery message and send a response
-
-//    byte[] serverInfo = Encoding.ASCII.GetBytes("SERVER_INFO");
-//    serverSocket.SendTo(serverInfo, clientEndpoint);
-//}
-

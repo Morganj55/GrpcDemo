@@ -8,7 +8,7 @@ service Connections {
   // Sends a greeting
   rpc TestConnection (TestRequest) returns (TestReply);
   rpc EstablishConnectionHealthCheck (ConnectionRequest) returns (ConnectionResponse);
-
+  rpc GetAvailableLicenseCount (LicenseCountRequest) returns (LicenseCountResponse);
 }
 
 message TestRequest {
@@ -26,4 +26,12 @@ message ConnectionRequest{
 message ConnectionResponse{
 	string licence = 1;
 	int32 connectedClients = 2;
+}
+
+message LicenseCountRequest {
+
+}
+
+message LicenseCountResponse{
+	int32 numberOfAvailableLicenses = 1;
 }

@@ -36,7 +36,7 @@
             ServerReplyButton = new Button();
             debugTxtBox = new TextBox();
             label4 = new Label();
-            activePortLbl = new Label();
+            activeAddressLbl = new Label();
             label5 = new Label();
             IPAddressTxtBox = new TextBox();
             IPTestBtn = new Button();
@@ -60,14 +60,17 @@
             OpenFileBtn = new Button();
             label9 = new Label();
             tabPage3 = new TabPage();
+            GetDiscoveredLicenses = new Button();
+            label13 = new Label();
+            label11 = new Label();
+            DiscoverServersBtn = new Button();
             ConnectionStatusLbl = new Label();
             label3 = new Label();
             tabControl1 = new TabControl();
             tabPage4 = new TabPage();
             tabPage5 = new TabPage();
             backgroundTxtBox = new TextBox();
-            DiscoverServersBtn = new Button();
-            label11 = new Label();
+            RequestLicenseCheckBox = new CheckBox();
             tabcontrol.SuspendLayout();
             tabPage1.SuspendLayout();
             tabPage2.SuspendLayout();
@@ -150,14 +153,14 @@
             label4.TabIndex = 11;
             label4.Text = "Active Address:";
             // 
-            // activePortLbl
+            // activeAddressLbl
             // 
-            activePortLbl.AutoSize = true;
-            activePortLbl.Font = new Font("Segoe UI", 11.25F, FontStyle.Regular, GraphicsUnit.Point);
-            activePortLbl.Location = new Point(211, 201);
-            activePortLbl.Name = "activePortLbl";
-            activePortLbl.Size = new Size(0, 20);
-            activePortLbl.TabIndex = 12;
+            activeAddressLbl.AutoSize = true;
+            activeAddressLbl.Font = new Font("Segoe UI", 11.25F, FontStyle.Regular, GraphicsUnit.Point);
+            activeAddressLbl.Location = new Point(211, 201);
+            activeAddressLbl.Name = "activeAddressLbl";
+            activeAddressLbl.Size = new Size(0, 20);
+            activeAddressLbl.TabIndex = 12;
             // 
             // label5
             // 
@@ -390,6 +393,9 @@
             // 
             // tabPage3
             // 
+            tabPage3.Controls.Add(RequestLicenseCheckBox);
+            tabPage3.Controls.Add(GetDiscoveredLicenses);
+            tabPage3.Controls.Add(label13);
             tabPage3.Controls.Add(label11);
             tabPage3.Controls.Add(DiscoverServersBtn);
             tabPage3.Location = new Point(4, 24);
@@ -398,6 +404,44 @@
             tabPage3.TabIndex = 2;
             tabPage3.Text = "Discovery";
             tabPage3.UseVisualStyleBackColor = true;
+            // 
+            // GetDiscoveredLicenses
+            // 
+            GetDiscoveredLicenses.Location = new Point(183, 55);
+            GetDiscoveredLicenses.Name = "GetDiscoveredLicenses";
+            GetDiscoveredLicenses.Size = new Size(162, 23);
+            GetDiscoveredLicenses.TabIndex = 3;
+            GetDiscoveredLicenses.Text = "Get Licenses";
+            GetDiscoveredLicenses.UseVisualStyleBackColor = true;
+            GetDiscoveredLicenses.Click += GetDiscoveredLicenses_Click;
+            // 
+            // label13
+            // 
+            label13.AutoSize = true;
+            label13.Location = new Point(3, 59);
+            label13.Name = "label13";
+            label13.Size = new Size(174, 15);
+            label13.TabIndex = 2;
+            label13.Text = "See Available Network Licenses:";
+            // 
+            // label11
+            // 
+            label11.AutoSize = true;
+            label11.Location = new Point(17, 24);
+            label11.Name = "label11";
+            label11.Size = new Size(160, 15);
+            label11.TabIndex = 1;
+            label11.Text = "Discover Servers on Network:";
+            // 
+            // DiscoverServersBtn
+            // 
+            DiscoverServersBtn.Location = new Point(183, 20);
+            DiscoverServersBtn.Name = "DiscoverServersBtn";
+            DiscoverServersBtn.Size = new Size(162, 23);
+            DiscoverServersBtn.TabIndex = 0;
+            DiscoverServersBtn.Text = "Discover";
+            DiscoverServersBtn.UseVisualStyleBackColor = true;
+            DiscoverServersBtn.Click += DiscoverServersBtn_Click;
             // 
             // ConnectionStatusLbl
             // 
@@ -460,24 +504,15 @@
             backgroundTxtBox.Size = new Size(762, 136);
             backgroundTxtBox.TabIndex = 0;
             // 
-            // DiscoverServersBtn
+            // RequestLicenseCheckBox
             // 
-            DiscoverServersBtn.Location = new Point(169, 15);
-            DiscoverServersBtn.Name = "DiscoverServersBtn";
-            DiscoverServersBtn.Size = new Size(162, 23);
-            DiscoverServersBtn.TabIndex = 0;
-            DiscoverServersBtn.Text = "Discover";
-            DiscoverServersBtn.UseVisualStyleBackColor = true;
-            DiscoverServersBtn.Click += DiscoverServersBtn_Click;
-            // 
-            // label11
-            // 
-            label11.AutoSize = true;
-            label11.Location = new Point(3, 19);
-            label11.Name = "label11";
-            label11.Size = new Size(160, 15);
-            label11.TabIndex = 1;
-            label11.Text = "Discover Servers on Network:";
+            RequestLicenseCheckBox.AutoSize = true;
+            RequestLicenseCheckBox.Location = new Point(351, 59);
+            RequestLicenseCheckBox.Name = "RequestLicenseCheckBox";
+            RequestLicenseCheckBox.Size = new Size(110, 19);
+            RequestLicenseCheckBox.TabIndex = 4;
+            RequestLicenseCheckBox.Text = "Request License";
+            RequestLicenseCheckBox.UseVisualStyleBackColor = true;
             // 
             // Form1
             // 
@@ -489,7 +524,7 @@
             Controls.Add(tabControl1);
             Controls.Add(tabcontrol);
             Controls.Add(label4);
-            Controls.Add(activePortLbl);
+            Controls.Add(activeAddressLbl);
             Name = "Form1";
             Text = "Form1";
             tabcontrol.ResumeLayout(false);
@@ -518,7 +553,7 @@
         private Button ServerReplyButton;
         private TextBox debugTxtBox;
         private Label label4;
-        private Label activePortLbl;
+        private Label activeAddressLbl;
         private Label label5;
         private TextBox IPAddressTxtBox;
         private Button IPTestBtn;
@@ -550,5 +585,8 @@
         private Button GetFilesBtn;
         private Label label11;
         private Button DiscoverServersBtn;
+        private Button GetDiscoveredLicenses;
+        private Label label13;
+        private CheckBox RequestLicenseCheckBox;
     }
 }

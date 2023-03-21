@@ -1,5 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Diagnostics;
+using System.Net;
+using System.Net.Sockets;
 using Grpc.Core;
 using System.Timers;
 using GrpcServer;
@@ -22,16 +24,26 @@ namespace GrpcServer.Services
             _logger = logger;
             _connectedClients = 0;
             _clientIpAddresses = new List<string>();
+
+            var iPForToken = Dns.GetHostEntry(Dns.GetHostName()).AddressList
+                .FirstOrDefault(ip => ip.AddressFamily == AddressFamily.InterNetwork)?.ToString();
+            var token = $"{iPForToken}:{GenerateRandomString(5)}";
+
             _licenses = new List<string>
             {
-                "12345",
-                "abcde",
-                "678fghi"
+                token
             };
             _addressLicensePairs = new Dictionary<string, string>();
             _addressConnectionCount = new Dictionary<string, int>();
         }
 
+       private string GenerateRandomString(int length)
+        {
+            const string Chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+            var random = new Random();
+            return new string(Enumerable.Repeat(Chars, length)
+                .Select(s => s[random.Next(s.Length)]).ToArray());
+        }
 
         public override Task<TestReply> TestConnection(TestRequest request, ServerCallContext context)
         {
@@ -129,7 +141,6 @@ namespace GrpcServer.Services
             _addressConnectionCount.Add(iPAddress, 0);
         }
 
-
         private async Task CheckForIncomingConnections(string iPAddress)
         {
             while (true)
@@ -157,6 +168,14 @@ namespace GrpcServer.Services
                 }
 
             }
+        }
+
+        public override Task<LicenseCountResponse> GetAvailableLicenseCount(LicenseCountRequest request, ServerCallContext context)
+        {
+            return Task.FromResult(new LicenseCountResponse
+            {
+                NumberOfAvailableLicenses = _licenses.Count
+            });
         }
     }
 }

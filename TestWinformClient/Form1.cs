@@ -531,49 +531,26 @@ namespace TestWinformClient
         {
             const int portNumber = 8101;
             Cursor.Current = Cursors.WaitCursor;
+            debugTxtBox.Text += $"Searching for available servers, please wait...\r\n";
             var serverResponses = await DiscoverServersAsync(portNumber);
 
-            //Socket clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-            //clientSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Broadcast, 1);
-            ////clientSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.AcceptConnection, 1);
-
-            //byte[] discoveryPacket = Encoding.ASCII.GetBytes("DISCOVER");
-            //IPEndPoint broadcastEndpoint = new IPEndPoint(IPAddress.Broadcast, portNumber);
-            //clientSocket.SendTo(discoveryPacket, broadcastEndpoint);
-
-            //byte[] responseBuffer = new byte[1024];
-            //EndPoint serverEndpoint = new IPEndPoint(IPAddress.Any, 0);
-
-            //List<string> serverResponses = new List<string>();
-            //int bytesRead = clientSocket.ReceiveFrom(responseBuffer, ref serverEndpoint);
-            //string serverResponse = Encoding.ASCII.GetString(responseBuffer, 0, bytesRead);
-            //serverResponses.Add(serverResponse);
-            
             debugTxtBox.Text += $"There are {serverResponses.Count} servers running.\r\n";
 
-            //foreach (var ipAddress in serverResponses.Values)
-            //{
-            //    debugTxtBox.Text += $"Found IP addresses running the server are:{ipAddress.ToString()}\r\n";
-            //}
             foreach (var ipAddress in serverResponses)
             {
                 debugTxtBox.Text += $"Found IP addresses running the server are:{ipAddress.ToString()}\r\n";
             }
-            Cursor.Current = Cursors.Default;
+            
         }
-
 
         private static async Task<List<EndPoint>> DiscoverServersAsync(int portNumber)
         {
-            //Dictionary<string, EndPoint>
-            //Dictionary<string, EndPoint> serverResponses = new Dictionary<string, EndPoint>();
+            
             List<EndPoint> serverResponses = new List<EndPoint>();
-            //List<string> serverResponses = new List<string>();
 
             using (var clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp))
             {
                 clientSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Broadcast, 1);
-                //clientSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReceiveBroadcast, 1);
 
                 byte[] discoveryPacket = Encoding.ASCII.GetBytes("DISCOVER");
                 IPEndPoint broadcastEndpoint = new IPEndPoint(IPAddress.Broadcast, portNumber);
@@ -582,29 +559,6 @@ namespace TestWinformClient
                 byte[] responseBuffer = new byte[1024];
                 EndPoint serverEndpoint = new IPEndPoint(IPAddress.Any, 0);
 
-                //DateTime startTime = DateTime.UtcNow;
-
-                //while ((DateTime.UtcNow - startTime).TotalSeconds < 10) // Wait for 10 seconds or until a certain number of responses have been received
-                //{
-                //    try
-                //    {
-                //        var result = await clientSocket.ReceiveFromAsync(new ArraySegment<byte>(responseBuffer), SocketFlags.None, serverEndpoint);
-
-                //        string serverResponse = Encoding.ASCII.GetString(responseBuffer, 0, result.ReceivedBytes);
-                //        serverResponses.Add(serverResponse);
-                //    }
-                //    catch (SocketException ex)
-                //    {
-                //        if (ex.SocketErrorCode == SocketError.TimedOut)
-                //        {
-                //            break;
-                //        }
-                //        else
-                //        {
-                //            throw;
-                //        }
-                //    }
-                //}
                 var receiveTask = Task.Run(async () =>
                 {
                     while (true)
@@ -618,7 +572,6 @@ namespace TestWinformClient
                             string serverResponse =
                                 Encoding.ASCII.GetString(responseBuffer, 0, receiveResult.ReceivedBytes);
 
-                            
                             serverResponses.Add(receiveResult.RemoteEndPoint);
                         }
                         catch (Exception ex)

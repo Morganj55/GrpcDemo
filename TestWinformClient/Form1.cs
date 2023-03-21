@@ -1,15 +1,22 @@
 
+using System.Collections.Generic;
+using System.Dynamic;
+using System;
 using System.IO;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
+using System.Numerics;
 using System.Text;
 using System.Threading.Channels;
 using System.Windows.Forms;
 using Google.Protobuf;
+using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using Grpc.Health.V1;
 using Grpc.Net.Client;
+using Microsoft.AspNetCore.Hosting.Server;
+using Microsoft.VisualBasic.ApplicationServices;
 using TestWinformClient.Protos;
 using static System.Net.WebRequestMethods;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
@@ -520,36 +527,122 @@ namespace TestWinformClient
             }
         }
 
-        private void DiscoverServersBtn_Click(object sender, EventArgs e)
+        private async void DiscoverServersBtn_Click(object sender, EventArgs e)
         {
             const int portNumber = 8101;
-            Socket clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-            clientSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Broadcast, 1);
-            //clientSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.AcceptConnection, 1);
+            Cursor.Current = Cursors.WaitCursor;
+            var serverResponses = await DiscoverServersAsync(portNumber);
 
-            byte[] discoveryPacket = Encoding.ASCII.GetBytes("DISCOVER");
-            IPEndPoint broadcastEndpoint = new IPEndPoint(IPAddress.Broadcast, portNumber);
-            clientSocket.SendTo(discoveryPacket, broadcastEndpoint);
+            //Socket clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+            //clientSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Broadcast, 1);
+            ////clientSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.AcceptConnection, 1);
 
-            byte[] responseBuffer = new byte[1024];
-            EndPoint serverEndpoint = new IPEndPoint(IPAddress.Any, 0);
-            int bytesRead = clientSocket.ReceiveFrom(responseBuffer, ref serverEndpoint);
-            string serverResponse = Encoding.ASCII.GetString(responseBuffer, 0, bytesRead);
-            List<string> serverResponses = new List<string>();
-            serverResponses.Add(serverResponse);
+            //byte[] discoveryPacket = Encoding.ASCII.GetBytes("DISCOVER");
+            //IPEndPoint broadcastEndpoint = new IPEndPoint(IPAddress.Broadcast, portNumber);
+            //clientSocket.SendTo(discoveryPacket, broadcastEndpoint);
 
+            //byte[] responseBuffer = new byte[1024];
+            //EndPoint serverEndpoint = new IPEndPoint(IPAddress.Any, 0);
+
+            //List<string> serverResponses = new List<string>();
+            //int bytesRead = clientSocket.ReceiveFrom(responseBuffer, ref serverEndpoint);
+            //string serverResponse = Encoding.ASCII.GetString(responseBuffer, 0, bytesRead);
+            //serverResponses.Add(serverResponse);
+            
             debugTxtBox.Text += $"There are {serverResponses.Count} servers running.\r\n";
 
-            foreach (var server in serverResponses)
+            //foreach (var ipAddress in serverResponses.Values)
+            //{
+            //    debugTxtBox.Text += $"Found IP addresses running the server are:{ipAddress.ToString()}\r\n";
+            //}
+            foreach (var ipAddress in serverResponses)
             {
-                IPEndPoint serverIpEndpoint = (IPEndPoint)serverEndpoint;
-                IPAddress serverIpAddress = serverIpEndpoint.Address;
-
-                debugTxtBox.Text += $"Found IP addresses running the server are:{serverIpAddress.ToString()}\r\n";
+                debugTxtBox.Text += $"Found IP addresses running the server are:{ipAddress.ToString()}\r\n";
             }
-
-
-
+            Cursor.Current = Cursors.Default;
         }
+
+
+        private static async Task<List<EndPoint>> DiscoverServersAsync(int portNumber)
+        {
+            //Dictionary<string, EndPoint>
+            //Dictionary<string, EndPoint> serverResponses = new Dictionary<string, EndPoint>();
+            List<EndPoint> serverResponses = new List<EndPoint>();
+            //List<string> serverResponses = new List<string>();
+
+            using (var clientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp))
+            {
+                clientSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Broadcast, 1);
+                //clientSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReceiveBroadcast, 1);
+
+                byte[] discoveryPacket = Encoding.ASCII.GetBytes("DISCOVER");
+                IPEndPoint broadcastEndpoint = new IPEndPoint(IPAddress.Broadcast, portNumber);
+                await clientSocket.SendToAsync(new ArraySegment<byte>(discoveryPacket), SocketFlags.None, broadcastEndpoint);
+
+                byte[] responseBuffer = new byte[1024];
+                EndPoint serverEndpoint = new IPEndPoint(IPAddress.Any, 0);
+
+                //DateTime startTime = DateTime.UtcNow;
+
+                //while ((DateTime.UtcNow - startTime).TotalSeconds < 10) // Wait for 10 seconds or until a certain number of responses have been received
+                //{
+                //    try
+                //    {
+                //        var result = await clientSocket.ReceiveFromAsync(new ArraySegment<byte>(responseBuffer), SocketFlags.None, serverEndpoint);
+
+                //        string serverResponse = Encoding.ASCII.GetString(responseBuffer, 0, result.ReceivedBytes);
+                //        serverResponses.Add(serverResponse);
+                //    }
+                //    catch (SocketException ex)
+                //    {
+                //        if (ex.SocketErrorCode == SocketError.TimedOut)
+                //        {
+                //            break;
+                //        }
+                //        else
+                //        {
+                //            throw;
+                //        }
+                //    }
+                //}
+                var receiveTask = Task.Run(async () =>
+                {
+                    while (true)
+                    {
+                        try
+                        {
+                            SocketReceiveFromResult receiveResult =
+                                await clientSocket.ReceiveFromAsync(new ArraySegment<byte>(responseBuffer),
+                                    SocketFlags.None, serverEndpoint);
+
+                            string serverResponse =
+                                Encoding.ASCII.GetString(responseBuffer, 0, receiveResult.ReceivedBytes);
+
+                            
+                            serverResponses.Add(receiveResult.RemoteEndPoint);
+                        }
+                        catch (Exception ex)
+                        {
+                            break;
+                        }
+                      
+                    }
+                });
+
+                await Task.Delay(10000);
+                clientSocket.Close();
+                await receiveTask;
+            }
+            return serverResponses;
+        }
+
+
+
+
+
+
+
+
+
     }
 }

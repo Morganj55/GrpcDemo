@@ -60,11 +60,12 @@
             OpenFileBtn = new Button();
             label9 = new Label();
             tabPage3 = new TabPage();
-            RequestLicenseCheckBox = new CheckBox();
+            label15 = new Label();
+            DiscoveryConnectBtn = new Button();
             GetDiscoveredLicenses = new Button();
             label13 = new Label();
             label11 = new Label();
-            DiscoverServersBtn = new Button();
+            DiscoverServersIPV4Btn = new Button();
             ConnectionStatusLbl = new Label();
             label3 = new Label();
             tabControl1 = new TabControl();
@@ -73,6 +74,10 @@
             backgroundTxtBox = new TextBox();
             label14 = new Label();
             ActiveLicenseLbl = new Label();
+            label16 = new Label();
+            label17 = new Label();
+            label18 = new Label();
+            DiscoverServersIPV6Btn = new Button();
             tabcontrol.SuspendLayout();
             tabPage1.SuspendLayout();
             tabPage2.SuspendLayout();
@@ -395,11 +400,16 @@
             // 
             // tabPage3
             // 
-            tabPage3.Controls.Add(RequestLicenseCheckBox);
+            tabPage3.Controls.Add(DiscoverServersIPV6Btn);
+            tabPage3.Controls.Add(label18);
+            tabPage3.Controls.Add(label17);
+            tabPage3.Controls.Add(label16);
+            tabPage3.Controls.Add(label15);
+            tabPage3.Controls.Add(DiscoveryConnectBtn);
             tabPage3.Controls.Add(GetDiscoveredLicenses);
             tabPage3.Controls.Add(label13);
             tabPage3.Controls.Add(label11);
-            tabPage3.Controls.Add(DiscoverServersBtn);
+            tabPage3.Controls.Add(DiscoverServersIPV4Btn);
             tabPage3.Location = new Point(4, 24);
             tabPage3.Name = "tabPage3";
             tabPage3.Size = new Size(768, 190);
@@ -407,19 +417,28 @@
             tabPage3.Text = "Discovery";
             tabPage3.UseVisualStyleBackColor = true;
             // 
-            // RequestLicenseCheckBox
+            // label15
             // 
-            RequestLicenseCheckBox.AutoSize = true;
-            RequestLicenseCheckBox.Location = new Point(351, 59);
-            RequestLicenseCheckBox.Name = "RequestLicenseCheckBox";
-            RequestLicenseCheckBox.Size = new Size(247, 19);
-            RequestLicenseCheckBox.TabIndex = 4;
-            RequestLicenseCheckBox.Text = "Establish Connection and Request License";
-            RequestLicenseCheckBox.UseVisualStyleBackColor = true;
+            label15.AutoSize = true;
+            label15.Location = new Point(3, 111);
+            label15.Name = "label15";
+            label15.Size = new Size(244, 15);
+            label15.TabIndex = 6;
+            label15.Text = "Connect and Request Next Available License:";
+            // 
+            // DiscoveryConnectBtn
+            // 
+            DiscoveryConnectBtn.Location = new Point(253, 107);
+            DiscoveryConnectBtn.Name = "DiscoveryConnectBtn";
+            DiscoveryConnectBtn.Size = new Size(92, 23);
+            DiscoveryConnectBtn.TabIndex = 5;
+            DiscoveryConnectBtn.Text = "Connect";
+            DiscoveryConnectBtn.UseVisualStyleBackColor = true;
+            DiscoveryConnectBtn.Click += DiscoveryConnectBtn_Click;
             // 
             // GetDiscoveredLicenses
             // 
-            GetDiscoveredLicenses.Location = new Point(183, 55);
+            GetDiscoveredLicenses.Location = new Point(183, 70);
             GetDiscoveredLicenses.Name = "GetDiscoveredLicenses";
             GetDiscoveredLicenses.Size = new Size(162, 23);
             GetDiscoveredLicenses.TabIndex = 3;
@@ -430,7 +449,7 @@
             // label13
             // 
             label13.AutoSize = true;
-            label13.Location = new Point(3, 59);
+            label13.Location = new Point(3, 74);
             label13.Name = "label13";
             label13.Size = new Size(174, 15);
             label13.TabIndex = 2;
@@ -439,21 +458,21 @@
             // label11
             // 
             label11.AutoSize = true;
-            label11.Location = new Point(17, 24);
+            label11.Location = new Point(3, 39);
             label11.Name = "label11";
             label11.Size = new Size(160, 15);
             label11.TabIndex = 1;
             label11.Text = "Discover Servers on Network:";
             // 
-            // DiscoverServersBtn
+            // DiscoverServersIPV4Btn
             // 
-            DiscoverServersBtn.Location = new Point(183, 20);
-            DiscoverServersBtn.Name = "DiscoverServersBtn";
-            DiscoverServersBtn.Size = new Size(162, 23);
-            DiscoverServersBtn.TabIndex = 0;
-            DiscoverServersBtn.Text = "Discover";
-            DiscoverServersBtn.UseVisualStyleBackColor = true;
-            DiscoverServersBtn.Click += DiscoverServersBtn_Click;
+            DiscoverServersIPV4Btn.Location = new Point(169, 35);
+            DiscoverServersIPV4Btn.Name = "DiscoverServersIPV4Btn";
+            DiscoverServersIPV4Btn.Size = new Size(176, 23);
+            DiscoverServersIPV4Btn.TabIndex = 0;
+            DiscoverServersIPV4Btn.Text = "Discover";
+            DiscoverServersIPV4Btn.UseVisualStyleBackColor = true;
+            DiscoverServersIPV4Btn.Click += DiscoverServersBtn_Click;
             // 
             // ConnectionStatusLbl
             // 
@@ -534,6 +553,45 @@
             ActiveLicenseLbl.Size = new Size(0, 15);
             ActiveLicenseLbl.TabIndex = 21;
             // 
+            // label16
+            // 
+            label16.AutoSize = true;
+            label16.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point);
+            label16.Location = new Point(7, 10);
+            label16.Name = "label16";
+            label16.Size = new Size(125, 21);
+            label16.TabIndex = 7;
+            label16.Text = "IPV4 Discovery";
+            // 
+            // label17
+            // 
+            label17.AutoSize = true;
+            label17.Font = new Font("Segoe UI", 12F, FontStyle.Bold, GraphicsUnit.Point);
+            label17.Location = new Point(372, 10);
+            label17.Name = "label17";
+            label17.Size = new Size(125, 21);
+            label17.TabIndex = 8;
+            label17.Text = "IPV6 Discovery";
+            // 
+            // label18
+            // 
+            label18.AutoSize = true;
+            label18.Location = new Point(372, 39);
+            label18.Name = "label18";
+            label18.Size = new Size(160, 15);
+            label18.TabIndex = 9;
+            label18.Text = "Discover Servers on Network:";
+            // 
+            // DiscoverServersIPV6Btn
+            // 
+            DiscoverServersIPV6Btn.Location = new Point(532, 35);
+            DiscoverServersIPV6Btn.Name = "DiscoverServersIPV6Btn";
+            DiscoverServersIPV6Btn.Size = new Size(147, 23);
+            DiscoverServersIPV6Btn.TabIndex = 10;
+            DiscoverServersIPV6Btn.Text = "Discover";
+            DiscoverServersIPV6Btn.UseVisualStyleBackColor = true;
+            DiscoverServersIPV6Btn.Click += DiscoverServersIPV6Btn_Click;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -606,11 +664,16 @@
         private Label label10;
         private Button GetFilesBtn;
         private Label label11;
-        private Button DiscoverServersBtn;
+        private Button DiscoverServersIPV4Btn;
         private Button GetDiscoveredLicenses;
         private Label label13;
-        private CheckBox RequestLicenseCheckBox;
         private Label label14;
         private Label ActiveLicenseLbl;
+        private Label label15;
+        private Button DiscoveryConnectBtn;
+        private Label label16;
+        private Button DiscoverServersIPV6Btn;
+        private Label label18;
+        private Label label17;
     }
 }

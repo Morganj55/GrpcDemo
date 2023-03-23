@@ -27,7 +27,7 @@ namespace GrpcServer.Services
 
             var iPForToken = Dns.GetHostEntry(Dns.GetHostName()).AddressList
                 .FirstOrDefault(ip => ip.AddressFamily == AddressFamily.InterNetwork)?.ToString();
-            var token = $"{iPForToken}:{GenerateRandomString(5)}";
+            var token = $"({iPForToken}) : {GenerateRandomString(5)}";
 
             _licenses = new List<string>
             {

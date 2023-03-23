@@ -55,7 +55,9 @@ namespace TestWinformClient
 
         private List<string> AvailableServerFilesToDownload { get; set; }
 
-        private List<EndPoint> DiscoveredServerIpAddresses { get; set; }
+        private List<EndPoint> DiscoveredServerIpv4Addresses { get; set; }
+
+        private List<EndPoint> DiscoveredServerIpv6Addresses { get; set; }
 
         private async void TestConnectionBtn_Click(object sender, EventArgs e)
         {
@@ -536,21 +538,21 @@ namespace TestWinformClient
 
             Cursor.Current = Cursors.WaitCursor;
             debugTxtBox.Text += $"Searching for available servers, please wait...\r\n";
-           
-            DiscoveredServerIpAddresses = new List<EndPoint>();
-            DiscoveredServerIpAddresses = await DiscoverServersAsync(portNumber);
 
-            debugTxtBox.Text += $" ({DiscoveredServerIpAddresses.Count}) servers discovered.\r\n";
+            DiscoveredServerIpv4Addresses = new List<EndPoint>();
+            DiscoveredServerIpv4Addresses = await DiscoverServersIpv4Async(portNumber);
 
-            foreach (var ipAddress in DiscoveredServerIpAddresses)
+            debugTxtBox.Text += $" ({DiscoveredServerIpv4Addresses.Count}) servers discovered.\r\n";
+
+            foreach (var ipAddress in DiscoveredServerIpv4Addresses)
             {
-                var iPString = FormatIpEndPointToString(ipAddress);
+                var iPString = RemovePortNumberFromIP(ipAddress);
                 debugTxtBox.Text += $"Server IP address:{iPString}\r\n";
             }
 
         }
 
-        private static async Task<List<EndPoint>> DiscoverServersAsync(int portNumber)
+        private static async Task<List<EndPoint>> DiscoverServersIpv4Async(int portNumber)
         {
             List<EndPoint> serverResponses = new List<EndPoint>();
 
@@ -607,18 +609,18 @@ namespace TestWinformClient
         {
             int availableNetworkLicenses = 0;
             int portNumber = 5001;
-            if (DiscoveredServerIpAddresses.Count == 0)
+            if (DiscoveredServerIpv4Addresses.Count == 0)
             {
                 debugTxtBox.Text += $"No servers found.\r\n";
                 return;
             }
 
-            foreach (var iPAddress in DiscoveredServerIpAddresses)
+            foreach (var iPAddress in DiscoveredServerIpv4Addresses)
             {
                 try
                 {
                     activeAddressLbl.Text = "";
-                    var iPString = FormatIpEndPointToString(iPAddress);
+                    var iPString = RemovePortNumberFromIP(iPAddress);
                     var testChannel = GrpcChannel.ForAddress($"http://{iPString}:{portNumber}");
                     var testClient = new Connections.ConnectionsClient(testChannel);
 
@@ -630,26 +632,18 @@ namespace TestWinformClient
 
                     debugTxtBox.Text += $"Server IP:{iPString} has:({reply.NumberOfAvailableLicenses}) license(s).\r\n";
                     availableNetworkLicenses += reply.NumberOfAvailableLicenses;
-
-
-                    if (reply.NumberOfAvailableLicenses > 0 && RequestLicenseCheckBox.Checked)
-                    {
-                        debugTxtBox.Text += "Establishing health connection to server: check background services.\r\n";
-                        activeAddressLbl.Text = $"{iPString}";
-                        await EstablishHealthConnection(testClient);
-                    }
                 }
                 catch (Exception ex)
                 {
                     Cursor.Current = Cursors.Default;
-                    debugTxtBox.Text += $"The connection to {FormatIpEndPointToString(iPAddress)}:{portNumber} was NOT SUCCESFUL.\r\n";
+                    debugTxtBox.Text += $"The connection to {RemovePortNumberFromIP(iPAddress)}:{portNumber} was NOT SUCCESFUL.\r\n";
                 }
             }
 
             debugTxtBox.Text += $"Available Network Licenses: ({availableNetworkLicenses}).\r\n";
         }
 
-        private string FormatIpEndPointToString(EndPoint ipAddress)
+        private string RemovePortNumberFromIP(EndPoint ipAddress)
         {
             var iPString = ipAddress.ToString();
             for (int i = 0; i < iPString.Length; i++)
@@ -662,5 +656,123 @@ namespace TestWinformClient
             return null;
         }
 
+        private async void DiscoveryConnectBtn_Click(object sender, EventArgs e)
+        {
+            {
+                int availableNetworkLicenses = 0;
+                int portNumber = 5001;
+                if (DiscoveredServerIpv4Addresses.Count == 0)
+                {
+                    debugTxtBox.Text += $"No servers found.\r\n";
+                    return;
+                }
+
+                foreach (var iPAddress in DiscoveredServerIpv4Addresses)
+                {
+                    try
+                    {
+                        activeAddressLbl.Text = "";
+                        var iPString = RemovePortNumberFromIP(iPAddress);
+                        var testChannel = GrpcChannel.ForAddress($"http://{iPString}:{portNumber}");
+                        var testClient = new Connections.ConnectionsClient(testChannel);
+
+                        var input = new LicenseCountRequest { };
+                        Cursor.Current = Cursors.WaitCursor;
+                        var reply = await testClient.GetAvailableLicenseCountAsync(input);
+                        Cursor.Current = Cursors.Default;
+                        availableNetworkLicenses += reply.NumberOfAvailableLicenses;
+
+                        if (reply.NumberOfAvailableLicenses > 0)
+                        {
+                            debugTxtBox.Text += "Establishing health connection to server: check background services.\r\n";
+                            activeAddressLbl.Text = $"{iPString}";
+                            await EstablishHealthConnection(testClient);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Cursor.Current = Cursors.Default;
+                        debugTxtBox.Text += $"The connection to {RemovePortNumberFromIP(iPAddress)}:{portNumber} was NOT SUCCESFUL.\r\n";
+                    }
+                }
+
+                debugTxtBox.Text += $"Available Network Licenses: ({availableNetworkLicenses}).\r\n";
+            }
+        }
+
+        private async void DiscoverServersIPV6Btn_Click(object sender, EventArgs e)
+        {
+            const int portNumber = 10103;
+
+            Cursor.Current = Cursors.WaitCursor;
+            debugTxtBox.Text += $"Searching for available servers, please wait...\r\n";
+
+            DiscoveredServerIpv6Addresses = new List<EndPoint>();
+            DiscoveredServerIpv6Addresses = await DiscoverServersIpv6Async(portNumber);
+
+            debugTxtBox.Text += $" ({DiscoveredServerIpv6Addresses.Count}) servers discovered.\r\n";
+
+            foreach (var ipAddress in DiscoveredServerIpv6Addresses)
+            {
+                var iPString = ipAddress.ToString();
+                debugTxtBox.Text += $"Server IP address:{iPString}\r\n";
+            }
+        }
+
+        private static async Task<List<EndPoint>> DiscoverServersIpv6Async(int portNumber)
+        {
+            List<EndPoint> serverResponses = new List<EndPoint>();
+            IPAddress multicastAddress = IPAddress.Parse("ff02::1");
+
+            using (var clientSocket = new Socket(AddressFamily.InterNetworkV6, SocketType.Dgram, ProtocolType.Udp))
+            {
+                clientSocket.SetSocketOption(SocketOptionLevel.IPv6, SocketOptionName.AddMembership, new IPv6MulticastOption(multicastAddress));
+                //clientSocket.SetSocketOption(SocketOptionLevel.IPv6, SocketOptionName.MulticastTimeToLive, 1);
+                clientSocket.Bind(new IPEndPoint( IPAddress.IPv6Any, portNumber));
+
+                byte[] discoveryPacket = Encoding.ASCII.GetBytes("DISCOVER");
+
+                //IPEndPoint broadcastEndpoint = new IPEndPoint(IPAddress.Broadcast, portNumber);
+                //var broadcastAddress = (IPAddress.Parse("239.255.255.250"));
+
+                IPEndPoint multicastEndpoint = new IPEndPoint(multicastAddress, portNumber);
+
+                await clientSocket.SendToAsync(new ArraySegment<byte>(discoveryPacket), SocketFlags.None, multicastEndpoint);
+
+                byte[] responseBuffer = new byte[1024];
+
+                // IPAddress.Any allows the endpoint to listen on all network interfaces that the machine has available, so that it can receive traffic from any source.
+                // Passing 0 into the port number actually means the the operating system will assign an available port number to the endpoint automatically, and will choose one not in use.
+                EndPoint serverEndpoint = new IPEndPoint(IPAddress.IPv6Any, 0);
+
+                var receiveTask = Task.Run(async () =>
+                {
+                    while (true)
+                    {
+                        try
+                        {
+                            SocketReceiveFromResult receiveResult =
+                                await clientSocket.ReceiveFromAsync(new ArraySegment<byte>(responseBuffer),
+                                    SocketFlags.None, serverEndpoint);
+
+                            string serverResponse =
+                                Encoding.ASCII.GetString(responseBuffer, 0, receiveResult.ReceivedBytes);
+
+                            serverResponses.Add(receiveResult.RemoteEndPoint);
+                        }
+                        catch (Exception ex)
+                        {
+                            break;
+                        }
+
+                    }
+                });
+
+                await Task.Delay(10000);
+                clientSocket.Close();
+                await receiveTask;
+            }
+            return serverResponses;
+        }
     }
 }

@@ -60,6 +60,7 @@
             OpenFileBtn = new Button();
             label9 = new Label();
             tabPage3 = new TabPage();
+            RequestLicenseCheckBox = new CheckBox();
             GetDiscoveredLicenses = new Button();
             label13 = new Label();
             label11 = new Label();
@@ -70,7 +71,8 @@
             tabPage4 = new TabPage();
             tabPage5 = new TabPage();
             backgroundTxtBox = new TextBox();
-            RequestLicenseCheckBox = new CheckBox();
+            label14 = new Label();
+            ActiveLicenseLbl = new Label();
             tabcontrol.SuspendLayout();
             tabPage1.SuspendLayout();
             tabPage2.SuspendLayout();
@@ -405,6 +407,16 @@
             tabPage3.Text = "Discovery";
             tabPage3.UseVisualStyleBackColor = true;
             // 
+            // RequestLicenseCheckBox
+            // 
+            RequestLicenseCheckBox.AutoSize = true;
+            RequestLicenseCheckBox.Location = new Point(351, 59);
+            RequestLicenseCheckBox.Name = "RequestLicenseCheckBox";
+            RequestLicenseCheckBox.Size = new Size(247, 19);
+            RequestLicenseCheckBox.TabIndex = 4;
+            RequestLicenseCheckBox.Text = "Establish Connection and Request License";
+            RequestLicenseCheckBox.UseVisualStyleBackColor = true;
+            // 
             // GetDiscoveredLicenses
             // 
             GetDiscoveredLicenses.Location = new Point(183, 55);
@@ -504,21 +516,31 @@
             backgroundTxtBox.Size = new Size(762, 136);
             backgroundTxtBox.TabIndex = 0;
             // 
-            // RequestLicenseCheckBox
+            // label14
             // 
-            RequestLicenseCheckBox.AutoSize = true;
-            RequestLicenseCheckBox.Location = new Point(351, 59);
-            RequestLicenseCheckBox.Name = "RequestLicenseCheckBox";
-            RequestLicenseCheckBox.Size = new Size(110, 19);
-            RequestLicenseCheckBox.TabIndex = 4;
-            RequestLicenseCheckBox.Text = "Request License";
-            RequestLicenseCheckBox.UseVisualStyleBackColor = true;
+            label14.AutoSize = true;
+            label14.Font = new Font("Segoe UI", 15.75F, FontStyle.Bold, GraphicsUnit.Point);
+            label14.Location = new Point(466, 201);
+            label14.Name = "label14";
+            label14.Size = new Size(157, 30);
+            label14.TabIndex = 20;
+            label14.Text = "Active License:";
+            // 
+            // ActiveLicenseLbl
+            // 
+            ActiveLicenseLbl.AutoSize = true;
+            ActiveLicenseLbl.Location = new Point(629, 213);
+            ActiveLicenseLbl.Name = "ActiveLicenseLbl";
+            ActiveLicenseLbl.Size = new Size(0, 15);
+            ActiveLicenseLbl.TabIndex = 21;
             // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 552);
+            Controls.Add(ActiveLicenseLbl);
+            Controls.Add(label14);
             Controls.Add(ConnectionStatusLbl);
             Controls.Add(label3);
             Controls.Add(tabControl1);
@@ -588,5 +610,7 @@
         private Button GetDiscoveredLicenses;
         private Label label13;
         private CheckBox RequestLicenseCheckBox;
+        private Label label14;
+        private Label ActiveLicenseLbl;
     }
 }

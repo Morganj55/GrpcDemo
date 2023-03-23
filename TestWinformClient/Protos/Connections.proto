@@ -3,13 +3,14 @@
 option csharp_namespace = "TestWinformClient.Protos";
 
 
-// The greeting service definition.
+//The "Service Connections" is essentially a C# class. 
+// The service has "rpc" or remote prodcedure calls that act like C# methods
+// rpc's require "messages" to be sent and returned (indicated by the "returns" keyword)
+// There are different types of rpc which can use different types of message
 service Connections {
-  // Sends a greeting
   rpc TestConnection (TestRequest) returns (TestReply);
   rpc EstablishConnectionHealthCheck (ConnectionRequest) returns (ConnectionResponse);
   rpc GetAvailableLicenseCount (LicenseCountRequest) returns (LicenseCountResponse);
-
 }
 
 message TestRequest {

@@ -158,6 +158,7 @@ namespace GrpcServer.Services
                 {
                     //remove last ip address and reclaim license
                     Debug.WriteLine($"Server has lost connection to client with IP address: {iPAddress}, reclaiming assigned license: {_addressLicensePairs[iPAddress]}");
+                    Console.WriteLine($"Server has lost connection to client with IP address: {iPAddress}, reclaiming assigned license: {_addressLicensePairs[iPAddress]}");
                     //_addressConnectionCount[iPAddress] = 0;
                     _addressConnectionCount.Remove(iPAddress);
                     _clientIpAddresses.Remove(iPAddress);

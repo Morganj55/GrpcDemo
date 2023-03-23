@@ -299,7 +299,7 @@ namespace TestWinformClient
         {
             var serverResponse = await client.EstablishConnectionHealthCheckAsync(new ConnectionRequest());
             backgroundTxtBox.Text += $"Server connection attempt ({call}) is: Serving.\r\n";
-            backgroundTxtBox.Text += $"Currently using License: {serverResponse.Licence}\r\n";
+            ActiveLicenseLbl.Text = $"{serverResponse.Licence}";
             backgroundTxtBox.Text += $"Connected clients: {serverResponse.ConnectedClients}.\r\n";
             backgroundTxtBox.Text += "\r\n";
             ConnectionStatusLbl.Text = "Connected";
@@ -362,6 +362,7 @@ namespace TestWinformClient
                     debugTxtBox.Text += "Succsesfully disconnected from the server.\r\n";
                     ConnectionStatusLbl.Text = "No connection";
                     ConnectionStatusLbl.BackColor = Color.White;
+                    ActiveLicenseLbl.Text = "";
                     Cursor.Current = Cursors.Default;
                     return true;
                 }
@@ -558,7 +559,12 @@ namespace TestWinformClient
                 clientSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.Broadcast, 1);
 
                 byte[] discoveryPacket = Encoding.ASCII.GetBytes("DISCOVER");
-                IPEndPoint broadcastEndpoint = new IPEndPoint(IPAddress.Broadcast, portNumber);
+
+                //IPEndPoint broadcastEndpoint = new IPEndPoint(IPAddress.Broadcast, portNumber);
+                var broadcastAddress = (IPAddress.Parse("239.255.255.250"));
+
+                IPEndPoint broadcastEndpoint = new IPEndPoint(broadcastAddress, portNumber);
+
                 await clientSocket.SendToAsync(new ArraySegment<byte>(discoveryPacket), SocketFlags.None, broadcastEndpoint);
 
                 byte[] responseBuffer = new byte[1024];
@@ -625,6 +631,7 @@ namespace TestWinformClient
 
                     if (reply.NumberOfAvailableLicenses > 0 && RequestLicenseCheckBox.Checked)
                     {
+                        debugTxtBox.Text += "Establishing health connection to server: check background services.\r\n";
                         activeAddressLbl.Text = $"{iPString}";
                         await EstablishHealthConnection(testClient);
                     }

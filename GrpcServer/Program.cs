@@ -82,6 +82,8 @@ async void StartServer(int portNumber)
 {
     UdpClient server = new UdpClient(portNumber);
     server.EnableBroadcast = true;
+    var broadcastAddress = (IPAddress.Parse("239.255.255.250"));
+    server.JoinMulticastGroup(broadcastAddress);
 
     while (true)
     {

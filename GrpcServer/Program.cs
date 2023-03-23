@@ -105,28 +105,32 @@ async void StartReceivingIpv6UdpRequests(int portNumber)
     // Set up the UDP socket
     Socket udpSocket = new Socket(AddressFamily.InterNetworkV6, SocketType.Dgram, ProtocolType.Udp);
     udpSocket.SetSocketOption(SocketOptionLevel.IPv6, SocketOptionName.AddMembership, new IPv6MulticastOption(multicastAddress));
-    udpSocket.Bind(new IPEndPoint(IPAddress.IPv6Any, 0));
+    udpSocket.Bind(new IPEndPoint(IPAddress.IPv6Any, portNumber));
 
     // Listen for incoming packets
     byte[] receiveBuffer = new byte[1024];
-    EndPoint remoteEndpoint = new IPEndPoint(IPAddress.IPv6Any, 0);
+    EndPoint remoteEndpoint = new IPEndPoint(IPAddress.IPv6Any, 8102);
 
     while (true)
     {
-        int bytesRead = udpSocket.ReceiveFrom(receiveBuffer, ref remoteEndpoint);
-        string message = Encoding.ASCII.GetString(receiveBuffer, 0, bytesRead);
-        Console.WriteLine("Received message from {0}: {1}", remoteEndpoint.ToString(), message);
+        var bytesRead =  await udpSocket.ReceiveFromAsync(new ArraySegment<byte>(receiveBuffer),
+            SocketFlags.None, remoteEndpoint); //(receiveBuffer, ref remoteEndpoint);
+
+        string message = Encoding.ASCII.GetString(receiveBuffer, 0, bytesRead.ReceivedBytes);
+        
+        var reSendAddress = bytesRead.RemoteEndPoint;
 
         // Echo the message back to the sender
         byte[] responseBuffer = Encoding.ASCII.GetBytes("Received your message: " + message);
-        udpSocket.SendTo(responseBuffer, remoteEndpoint);
+        await udpSocket.SendToAsync(new ArraySegment<byte>(responseBuffer),
+            SocketFlags.None, reSendAddress);
     }
 }
 
 int portNumberIpv4 = 8101;
 Task.Run(() => StartReceivingIpv4UdpRequests(portNumberIpv4));
 
-int portNumberIpv6 = 1103;
+int portNumberIpv6 = 9101;
 Task.Run(() => StartReceivingIpv6UdpRequests(portNumberIpv6));
 
 if (File.Exists(socketPath))

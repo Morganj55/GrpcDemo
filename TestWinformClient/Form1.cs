@@ -702,7 +702,7 @@ namespace TestWinformClient
 
         private async void DiscoverServersIPV6Btn_Click(object sender, EventArgs e)
         {
-            const int portNumber = 10103;
+            const int portNumber = 9101;
 
             Cursor.Current = Cursors.WaitCursor;
             debugTxtBox.Text += $"Searching for available servers, please wait...\r\n";
@@ -728,12 +728,10 @@ namespace TestWinformClient
             {
                 clientSocket.SetSocketOption(SocketOptionLevel.IPv6, SocketOptionName.AddMembership, new IPv6MulticastOption(multicastAddress));
                 //clientSocket.SetSocketOption(SocketOptionLevel.IPv6, SocketOptionName.MulticastTimeToLive, 1);
-                clientSocket.Bind(new IPEndPoint( IPAddress.IPv6Any, portNumber));
+                clientSocket.Bind(new IPEndPoint( IPAddress.IPv6Any, 8102));
 
                 byte[] discoveryPacket = Encoding.ASCII.GetBytes("DISCOVER");
 
-                //IPEndPoint broadcastEndpoint = new IPEndPoint(IPAddress.Broadcast, portNumber);
-                //var broadcastAddress = (IPAddress.Parse("239.255.255.250"));
 
                 IPEndPoint multicastEndpoint = new IPEndPoint(multicastAddress, portNumber);
 

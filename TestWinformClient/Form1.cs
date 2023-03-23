@@ -536,8 +536,8 @@ namespace TestWinformClient
 
             Cursor.Current = Cursors.WaitCursor;
             debugTxtBox.Text += $"Searching for available servers, please wait...\r\n";
+           
             DiscoveredServerIpAddresses = new List<EndPoint>();
-
             DiscoveredServerIpAddresses = await DiscoverServersAsync(portNumber);
 
             debugTxtBox.Text += $" ({DiscoveredServerIpAddresses.Count}) servers discovered.\r\n";
@@ -568,6 +568,9 @@ namespace TestWinformClient
                 await clientSocket.SendToAsync(new ArraySegment<byte>(discoveryPacket), SocketFlags.None, broadcastEndpoint);
 
                 byte[] responseBuffer = new byte[1024];
+
+                // IPAddress.Any allows the endpoint to listen on all network interfaces that the machine has available, so that it can receive traffic from any source.
+                // Passing 0 into the port number actually means the the operating system will assign an available port number to the endpoint automatically, and will choose one not in use.
                 EndPoint serverEndpoint = new IPEndPoint(IPAddress.Any, 0);
 
                 var receiveTask = Task.Run(async () =>

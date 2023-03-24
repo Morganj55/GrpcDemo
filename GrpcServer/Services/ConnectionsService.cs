@@ -25,9 +25,10 @@ namespace GrpcServer.Services
             _connectedClients = 0;
             _clientIpAddresses = new List<string>();
 
-            var iPForToken = Dns.GetHostEntry(Dns.GetHostName()).AddressList
-                .FirstOrDefault(ip => ip.AddressFamily == AddressFamily.InterNetwork)?.ToString();
-            var token = $"({iPForToken}) : {GenerateRandomString(5)}";
+            //var iPForToken = Dns.GetHostEntry(Dns.GetHostName()).AddressList
+            //    .FirstOrDefault(ip => ip.AddressFamily == AddressFamily.InterNetwork)?.ToString();
+           // var token = $"({iPForToken}) : {GenerateRandomString(5)}";
+           var token = GenerateRandomString(5);
 
             _licenses = new List<string>
             {
@@ -66,6 +67,7 @@ namespace GrpcServer.Services
         {
             //assign the IP address from the meta data
             var iPAddress = serverCallContext.Peer;
+            
 
             //Assigns IP Addresses to incoming client,
             bool licenseWasAssigned = AssignLicense(iPAddress);

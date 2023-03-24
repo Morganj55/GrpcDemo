@@ -113,17 +113,16 @@ async void StartReceivingIpv6UdpRequests(int portNumber)
 
     while (true)
     {
-        var bytesRead =  await udpSocket.ReceiveFromAsync(new ArraySegment<byte>(receiveBuffer),
-            SocketFlags.None, remoteEndpoint); //(receiveBuffer, ref remoteEndpoint);
+        var receivedResult =  await udpSocket.ReceiveFromAsync(new ArraySegment<byte>(receiveBuffer),
+            SocketFlags.None, remoteEndpoint); 
 
-        string message = Encoding.ASCII.GetString(receiveBuffer, 0, bytesRead.ReceivedBytes);
+        string message = Encoding.ASCII.GetString(receiveBuffer, 0, receivedResult.ReceivedBytes);
         
-        var reSendAddress = bytesRead.RemoteEndPoint;
 
         // Echo the message back to the sender
         byte[] responseBuffer = Encoding.ASCII.GetBytes("Received your message: " + message);
         await udpSocket.SendToAsync(new ArraySegment<byte>(responseBuffer),
-            SocketFlags.None, reSendAddress);
+            SocketFlags.None, receivedResult.RemoteEndPoint);
     }
 }
 

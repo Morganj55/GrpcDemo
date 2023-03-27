@@ -34,30 +34,62 @@ namespace TestWinformClient
             InitializeComponent();
             SuccessfulUnixClients = new List<Greeter.GreeterClient>();
             SuccessfulTcpClients = new Dictionary<string, bool>();
-            //IPAddressTxtBox.Text = "192.168.1.160";
             portTxtBox.Text = "5001";
         }
 
+        /// <summary>
+        /// The client used for the greeter service 
+        /// </summary>
         private Greeter.GreeterClient? GreeterClient { get; set; }
 
+        /// <summary>
+        /// The unix client that used with the greeter service to say "hello"
+        /// </summary>
         private List<Greeter.GreeterClient> SuccessfulUnixClients { get; set; }
 
+        /// <summary>
+        /// A list of IP addresses with a port number that has successfully connected to the server 
+        /// </summary>
         private Dictionary<string, bool> SuccessfulTcpClients { get; set; }
 
+        /// <summary>
+        /// The current file streaming client, used for the file transfer processes 
+        /// </summary>
         private FileStreaming.FileStreamingClient CurrentFileStreamClient { get; set; }
 
+        /// <summary>
+        /// Ip address set after pinging a specific IPV  4 or 6 address
+        /// </summary>
         private string IpAddress { get; set; }
 
+        /// <summary>
+        /// Flag to indicate if the disconnect button has been clicked 
+        /// </summary>
         private bool Disconnected { get; set; }
 
+        /// <summary>
+        ///  Flag to indicate if the health check is running 
+        /// </summary>
         private bool HealthCheckRunning { get; set; }
 
+        /// <summary>
+        /// The file path of the file that is to be uploaded to the server 
+        /// </summary>
         private string FileUploadPath { get; set; }
 
+        /// <summary>
+        /// A list of files found from the servers file directory that are available to download
+        /// </summary>
         private List<string> AvailableServerFilesToDownload { get; set; }
 
+        /// <summary>
+        /// A list of discovered IPV4 addresses
+        /// </summary>
         private List<EndPoint> DiscoveredServerIpv4Addresses { get; set; }
 
+        /// <summary>
+        /// A list of discovered IPV6 addresses
+        /// </summary>
         private List<EndPoint> DiscoveredServerIpv6Addresses { get; set; }
 
         /// <summary>
